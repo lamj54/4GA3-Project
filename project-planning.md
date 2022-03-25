@@ -16,6 +16,13 @@
 5. Look at each week's (i.e., seperate analyses) change in COVID and its relationship with income
 7. Looking at episode date rather than reported date 
 
+As defined by Open Data Toronto 
+Episode Date	
+The episode date is a derived variable that best estimates when the disease was acquired, and refers to the earliest available date from: symptom onset (the first day that COVID-19 symptoms occurred), laboratory specimen collection date, or reported date.
+
+Reported Date	
+The date on which the case was reported to Toronto Public Health.
+
 # Hypothesis
 Unclear for now. While lower incomes may be more limited in what preventative measures they can take against COVID, higher incomes may travel more and have greater risk of getting COVID.
 
