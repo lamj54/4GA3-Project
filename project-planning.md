@@ -1,33 +1,32 @@
 # Variables of Interest
-- Time period: December 2021 (when a big wave of COVID occured)
-- Main predictor: Income (average of all households in a neighbourhood during the specific time period)
+- Time period: 4 weeks within December 2021; Dec 1-29 (when a big wave of COVID occured)
+- Main predictor: Income (per capita average of all households in a neighbourhood during the specific time period)
 - Extra predictor variables of interest: minorities/ethnicities, household size (can do if we need to)
-- Response: COVID cases (rate in each neighbourhood)
+- Response: COVID cases (change in rate/proportion in each neighbourhood between weeks)
 
 # Rough Procedure
 1. Focus on December 2021 (peak of COVID cases)
 
-2. Aggregate COVID cases in each neighbourhood in each week of that month
+2. Aggregate COVID cases in each neighbourhood in each week of that month, divide by population of the neighbourhood and multiply by 1000 (cases per 1000)
 
-3. Calculate difference in COVID cases between each week-pair (1/2, 2/3, 3/4) and then take the average of them
+3. Aggregate income in each neighbourhood, find the average, and divide by the population to obtain average per capita income
 
-4. Look at its relationship with proportion of certain household sizes:
--	Don’t need to define what size is ‘large’, etc.—can talk about numbers and maybe identify thresholds ourselves from the results
+4. Calculate difference in COVID rates between each week-pair (2-1, 3-2, 4-3)
+
+5. Look at each week's (i.e., seperate analyses) change in COVID and its relationship with income
 
 # Hypothesis
-Neighborhoods with larger household sizes are more likely to have a faster rate of change in their COVID cases during infection wave. 
+Unclear for now. While lower incomes may be more limited in what preventative measures they can take against COVID, higher incomes may travel more and have greater risk of getting COVID.
 
 # Data
-- Toronto open source COVID Data – period between December 1st - December 31st
-- Toronto Neighborhoods data – household sizes 
+- Toronto open source COVID Data – 4 weeks of December (1st to 29th)
+- Toronto Neighborhoods data – household sizes, income, etc.
 
 # Concerns 
 - Time-lag of reported COVID cases
 - Too little spatial analysis?
 
 # Rubric
-This is the rubric for the final report:
-
 10% Introduction – Make sure that there is a clear and concise research question. The introduction is engaging, states the main topic and previews the structure of the paper.
 
 20% Background – Literature review is relevant, up to date, and complete. The background provides a conceptual or theoretical framework to support the analysis in the paper.
