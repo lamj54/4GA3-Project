@@ -14,6 +14,7 @@
 4. Calculate difference in COVID rates between each week-pair (2-1, 3-2, 4-3)
 
 5. Look at each week's (i.e., seperate analyses) change in COVID and its relationship with income
+7. Looking at episode date rather than reported date 
 
 # Hypothesis
 Unclear for now. While lower incomes may be more limited in what preventative measures they can take against COVID, higher incomes may travel more and have greater risk of getting COVID.
