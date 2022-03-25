@@ -1,0 +1,12 @@
+---
+title: "Data Pre-Processing"
+author: "Jason Lam"
+date: "25/03/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
