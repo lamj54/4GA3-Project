@@ -10,3 +10,38 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+```{r}
+#Libraries needed (maybe?)
+rm(list = ls())
+library(isdas)
+library(spatstat)
+library(tidyverse)
+library(ggplot2)
+library(rgdal)
+library(sf)
+```
+
+```{r}
+#Neighbourhood shp
+getwd()
+nshp <- st_read("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/Neighbourhoods.shp")
+
+st_drivers()
+
+ggplot() + 
+  geom_sf(data = nshp, size = 1, color = "black", fill = "cyan1") + 
+  ggtitle("Neighbourhoods") + 
+  coord_sf()
+
+
+```
+```{r}
+#Covid Cases
+covidcases <- read_csv("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/COVID19 cases.csv")
+
+date <- dplyr::filter(covidcases, covidcases$`Episode Date`=="Female")  ## "dplyr::" not required
+View(FemaleEmployees)
+
+
+```
+
