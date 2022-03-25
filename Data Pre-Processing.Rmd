@@ -19,6 +19,7 @@ library(tidyverse)
 library(ggplot2)
 library(rgdal)
 library(sf)
+library(dplyr)
 ```
 
 ```{r}
@@ -26,6 +27,7 @@ library(sf)
 getwd()
 nshp <- st_read("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/Neighbourhoods.shp")
 
+nshp
 st_drivers()
 
 ggplot() + 
@@ -34,14 +36,32 @@ ggplot() +
   coord_sf()
 
 
+
+
 ```
 ```{r}
 #Covid Cases
 covidcases <- read_csv("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/COVID19 cases.csv")
 
-date <- dplyr::filter(covidcases, covidcases$`Episode Date`=="Female")  ## "dplyr::" not required
-View(FemaleEmployees)
+chr <- as.character.Date(covidcases$`Episode Date`)
+              
+covidcases$'nd' <-chr 
 
+fweek <- c("2021-12-01","2021-12-02","2021-12-03","2021-12-04","2021-12-05","2021-12-06","2021-12-07")
+lweek <- c("2021-12-25","2021-12-26","2021-12-27","2021-12-28","2021-12-29","2021-12-30","2021-12-31")
+
+fweektb <- subset(covidcases,nd %in% fweek)
+lweektb <- subset(covidcases,nd %in% lweek)
+
+ftab <- as.data.frame(table(fweektb$`Neighbourhood Name`)) 
+ltab <- as.data.frame(table(lweektb$`Neighbourhood Name`)) 
+```
+```{r}
 
 ```
+
+```{r}
+
+```
+
 
