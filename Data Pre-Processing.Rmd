@@ -23,8 +23,9 @@ library(sf)
 
 ```{r}
 #Neighbourhood shp
-getwd()
-nshp <- st_read("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/Neighbourhoods.shp")
+wd <- getwd()
+
+nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
 
 st_drivers()
 
@@ -37,11 +38,12 @@ ggplot() +
 ```
 ```{r}
 #Covid Cases
-covidcases <- read_csv("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/COVID19 cases.csv")
-
-date <- dplyr::filter(covidcases, covidcases$`Episode Date`=="Female")  ## "dplyr::" not required
-View(FemaleEmployees)
+covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
 
 
+```
+
+```{r}
+covidcases$`Episode Date`[1]
 ```
 
