@@ -37,8 +37,6 @@ ggplot() +
   coord_sf()
 
 
-
-
 ```
 ```{r}
 #Covid Cases
@@ -67,7 +65,19 @@ covidcases$`Episode Date`[1]
 ```
 
 ```{r}
+#This section in creating final_table 
 
+#Neighbourhood_Name, F_weekcases, L_weekcases, POP, F_weekrate,, L_weekrate, Rate_over_month, Case_over_month
+
+#We need to add population for each neighbourhood and join it to the final table 
+
+Neighbourhood <- ftab$Var1
+F_weekcases <- ftab$Freq
+L_weekcases <- ltab$Freq
+Case_over_month <- ltab$Freq - ftab$Freq
+
+  
+Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
 ```
 
 
