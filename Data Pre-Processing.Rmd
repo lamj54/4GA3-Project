@@ -9,10 +9,13 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ```{r}
-#Libraries needed (maybe?)
 rm(list = ls())
+```
+
+
+```{r, include=FALSE}
+#Libraries needed (maybe?)
 library(isdas)
 library(spatstat)
 library(tidyverse)
@@ -23,7 +26,7 @@ library(dplyr)
 ```
 
 ```{r}
-#Neighbourhood shp
+# Set your working directory to the project folder 
 wd <- getwd()
 
 nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
@@ -41,7 +44,8 @@ ggplot() +
 ```{r}
 #Covid Cases
 covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
-
+#Neighborhood Data 
+neighbourhood <- read_csv(paste(wd,"/Neighbourhood_POP.csv", sep=""))
 ```
 
 
@@ -76,8 +80,18 @@ F_weekcases <- ftab$Freq
 L_weekcases <- ltab$Freq
 Case_over_month <- ltab$Freq - ftab$Freq
 
-  
+#Create Final table 
 Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
+
+#Merge neighbour with final table
+Final_Table <- merge(Final_Table, neighbourhood)
+
+#Creating the case rates per 10,000  
+Final_Table$F_weekrate <- Final_Table$F_weekcases/Final_Table$POP * 10000
+Final_Table$L_weekrate <- Final_Table$L_weekcases/Final_Table$POP * 10000
+
+#
+
 ```
 
 
