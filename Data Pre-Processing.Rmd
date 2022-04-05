@@ -86,12 +86,15 @@ Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
 #Merge neighbour with final table
 Final_Table <- merge(Final_Table, neighbourhood)
 
-#Creating the case rates per 10,000  
+# Creating the case rates per 10,000  
 Final_Table$F_weekrate <- Final_Table$F_weekcases/Final_Table$POP * 10000
 Final_Table$L_weekrate <- Final_Table$L_weekcases/Final_Table$POP * 10000
 
-#
+# Creating rate change 
+Final_Table$Rate_Change <- Final_Table$L_weekrate - Final_Table$F_weekrate
 
+# Creating fold increase 
+Final_Table$fold_increase <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /Final_Table$F_weekrate 
 ```
 
 
