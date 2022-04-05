@@ -9,11 +9,13 @@ library(sf)
 
 
 getwd()
-CSD <- st_read("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/WD/Neighbourhoods/Neighbourhoods.shp")
+nshp <- st_read("/Users/piercebourgeois/Documents/School/YEAR FOUR/4GA3/git/Neighbourhoods.shp")
+
 st_drivers()
 
 ggplot() + 
-  geom_sf(data = CSD, size = 1, color = "black", fill = "cyan1") + 
+  geom_sf(data = nshp, size = 1, color = "black", fill = "cyan1") + 
   ggtitle("Neighbourhoods") + 
   coord_sf()
+
 
