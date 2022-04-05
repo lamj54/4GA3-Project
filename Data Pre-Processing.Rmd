@@ -144,3 +144,8 @@ Socioeconomic_variables$Neighbourhood[30] <- "Danforth-East York"
 Final_Table <- merge(Final_Table, Socioeconomic_variables)
 ```
 
+```{r}
+#Merging shpfile to final table
+neighbourhoods <- left_join(Final_Table, nshp, c("Neighbourhood" = "FIELD_2"))
+```
+
