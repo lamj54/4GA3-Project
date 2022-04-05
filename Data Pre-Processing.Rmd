@@ -83,6 +83,17 @@ Case_over_month <- ltab$Freq - ftab$Freq
 #Create Final table 
 Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
 
+```
+
+
+```{r}
+#3 Neighbourhood are different so there must be an manual correction prior to merging 
+neighbourhood$Neighbourhood[128] <- "Weston-Pellam Park"
+neighbourhood$Neighbourhood[16] <- "Briar Hill - Belgravia"
+neighbourhood$Neighbourhood[30] <- "Danforth-East York"
+```
+
+```{r}
 #Merge neighbour with final table
 Final_Table <- merge(Final_Table, neighbourhood)
 
