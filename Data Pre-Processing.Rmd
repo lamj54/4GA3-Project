@@ -110,12 +110,19 @@ Final_Table$fold_increase <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /
 
 ```{r}
 #Neighbourhood Income Data
-NeighbourhoodIncome <- read_csv(paste(wd,"/NeighbourhoodsIncomeData.csv", sep=""))
+Socioeconomic_variables <- read_csv(paste(wd,"/Neighbourhoods_socioeconomic_variables.csv", sep=""))
 
 ```
+```{r}
+#3 Neighbourhood are different so there must be an manual correction prior to merging 
+Socioeconomic_variables$Neighbourhood[128] <- "Weston-Pellam Park"
+Socioeconomic_variables$Neighbourhood[16] <- "Briar Hill - Belgravia"
+Socioeconomic_variables$Neighbourhood[30] <- "Danforth-East York"
+```
+
 
 ```{r}
-#Merge neighbourhood income data with final table
-Final_Table <- merge(Final_Table, NeighbourhoodIncome)
+#Merge neighbourhood socioeconomic variables data with final table
+Final_Table <- merge(Final_Table, Socioeconomic_variables)
 ```
 
