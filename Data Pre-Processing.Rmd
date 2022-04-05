@@ -97,4 +97,14 @@ Final_Table$Rate_Change <- Final_Table$L_weekrate - Final_Table$F_weekrate
 Final_Table$fold_increase <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /Final_Table$F_weekrate 
 ```
 
+```{r}
+#Neighbourhood Income Data
+NeighbourhoodIncome <- read_csv(paste(wd,"/NeighbourhoodsIncomeData.csv", sep=""))
+
+```
+
+```{r}
+#Merge neighbourhood income data with final table
+Final_Table <- merge(Final_Table, NeighbourhoodIncome)
+```
 
