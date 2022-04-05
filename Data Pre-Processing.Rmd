@@ -26,21 +26,39 @@ library(dplyr)
 ```
 
 ```{r}
-# Set your working directory to the project folder 
+# Set working directory to the project folder on github
 wd <- getwd()
 
+#import shp file of neighbourhoods
 nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
-
-nshp
 st_drivers()
 
+#visualizing shpfile
 ggplot() + 
-  geom_sf(data = nshp, size = 1, color = "black", fill = "cyan1") + 
+  geom_sf(data = nshp, size = 1, color = "black", fill = "red") + 
   ggtitle("Neighbourhoods") + 
   coord_sf()
-
-
 ```
+
+```{r}
+#Deleting the neighbourhood ID from the neighbourhood field for pairing to final table
+
+#Extracting column as matrix
+f2 <- as.matrix(nshp[2])
+
+#deleting geometry field
+f2 <- subset(f2, select = -c(geometry) )
+
+#deleting neighbourhood IDs
+f2 <- gsub("[1234567890()]", " ", f2)
+
+#deleting space after
+f2 <- str_squish(f2)
+
+#rejoining to shp file
+nshp[2] <- f2
+```
+
 ```{r}
 #Covid Cases
 covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
