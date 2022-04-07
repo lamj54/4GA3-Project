@@ -30,9 +30,97 @@ Unclear for now. While lower incomes may be more limited in what preventative me
 - Toronto open source COVID Data – 4 weeks of December (1st to 29th)
 - Toronto Neighborhoods data – household sizes, income, etc.
 
+# Analysis Plan
+
+Chapter 19-26 deal with seeing if a single variable is random or not, while chapters 27-31 deal with regression analysis. For initial data exploration, we can use content from 19-26 like choropleth maps, SMAs and Moran’s I to explore each variable (e.g., see if the individual variables are random or not). For the actual data analysis, we do regression (start off simple with linear regression, content from 27/28), test the model’s residuals for randomness (use Moran’s I test + plotting them). If not random, redo the model and repeat the previous steps (Remedial action, covered in 27/29).
+
+## Breakdown of Relevant Textbook Chapters 
+
+This is so that it's easier for us to locate the code and other knowledge we want to use for the analysis.
+
+### Chapter 19/20
+- Initial data visualization methods
+- Choropleth maps
+    - remember to use rates
+    - plot for each variable
+- Cartograms
+
+### Chapter 21/22
+- Spatial weights matrix
+- Spatial moving average (SMA)
+    - Have different criteria for proximity
+    - Plot the variable vs. its SMA to see if it is spatially autocorrelated
+
+### Chapter 23/24
+- related to 21/22
+- Simulating null landscapes and calculating their SMAs to compare to the actual data
+- Scatterplots of SMA:
+    - Plot the line of best fit and compare to the 45 degree line; the closer it is, the more likely it is to be spatially autocorrelated
+- Moran's I (global)
+    - tests for spatial autocorrelation of a pattern
+    - can get the statistic's value, use a hypothesis test (p-value), scatterplot to complement the hypothesis test
+
+## Chapter 25/26
+- Local Moran's I
+    - Can see which areas contribute more to the autocorrelation (map the individual p-values of each sub-area)
+    - use it to detect hot/cold spots
+- G-statistic/function
+    - Local concentration
+    - We don't really use it much, I think we can just use Moran's I 
+
+### Chapter 27/28
+- Linear regression analysis
+    - Analyzes the relationship between certain variables (can have more than one predictor variable)
+    - Plot scatterplot of actual data points + regression line
+- Need to check the model’s results: check if the residuals are random (if yes, model got all the pattern; if not, makes assumption of the model invalid)
+    - to do this, map the residuals
+    - and use Moran's I test to check if it's spatially autocorrelated (i.e., p-value should be big enough so that it makes you accept the null hypothesis)
+- If the residuals are not random, need to adjust the model so that they are
+    - variable transformations
+    - add other covariates
+    - try a regime change
+- After making a new model, test the residuals again. If not random, repeat
+
+### Chapter 29/30 
+-	Continues off of 27/28
+-	Talks about methods to correct the model if the residuals are not random:
+-	Use a different functional form (e.g., transform the variables)
+-	Add more independent variables that are relevant
+-	If the functional form for the model isn’t clear, can use flexible functional forms (trend surface analysis), or use models with spatially-varying coefficients (Expansion method, geographically weighted regression)
+-	As a last resort: use the spatial error model
+
+## The Sample Project
+
+Just so that we have a general idea of what kind of methods we should be using + how to explain them.
+
+### Methods used for initial data exploration/visualization
+For the dependent variable:
+-	Choropleth maps of their dependent variable (for each year + for the average of the entire time period studied)
+-	Cartogram of their dependent variable averages over the entire time period
+-	Compared original data with simulated null landscapes by mapping their spatial moving averages + plotting their scatter plots
+-	Calculated spatial autocorrelation for it too: plotted the scatterplot for Moran’s, and gave the Moran’s I value + the p-value from the hypothesis test (global)
+-	Looked at local Moran’s I + plotted the HH, LL, etc. regions
+
+For the independent variable:
+-	Choropleth maps for each independent variable
+-	Compared these choropleth maps to the one from the dependent variable
+
+### Methods for the data analysis
+-	Linear regression
+    -	showed results of the linear regression (showed table + plot)
+    -	Had a grey region around the line, I think I’ve seen something similar before in the textbook, but not for linear regression so I'm not sure how they got this. I don't think they explain it in their report either
+
+### Analysis Section
+
+They basically explained why they used each test, interpreted all their figures + tests, and then related the results to their research question. The structure generally was:
+1.	Analyze whether our dependent variable is random or not (via methods described above)
+2.	Since it is not random, find the process (compare the choropleth maps of the independent and dependent variables visually, then quantitatively analyze using regression with an independent variable, etc.)
+
+But, they lost marks for **not analyzing the residuals for randomness and trying to correct the issue**, so we should remember to do that (through the methods explained above in chapter 29/30). 
+
 # Concerns 
-- Time-lag of reported COVID cases
-- Too little spatial analysis?
+- Time-lag of reported COVID cases/deaths
+- How many times should we try and correct the model before we use the spatial error model to force the residuals to become random?
 
 # Rubric
 10% Introduction – Make sure that there is a clear and concise research question. The introduction is engaging, states the main topic and previews the structure of the paper.
