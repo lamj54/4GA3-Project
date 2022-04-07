@@ -4,7 +4,7 @@
 - Extra predictor variables of interest: minorities/ethnicities, household size (can do if we need to)
 - Response: COVID cases (change in rate/proportion in each neighbourhood between weeks)
 
-# Rough Procedure
+# Rough Procedure for Data Processing
 1. Focus on December 2021 (peak of COVID cases)
 
 2. Aggregate COVID cases in each neighbourhood in each week of that month, divide by population of the neighbourhood and multiply by 1000 (cases per 1000)
