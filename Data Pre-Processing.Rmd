@@ -149,6 +149,22 @@ Final_Table <- merge(Final_Table, Socioeconomic_variables)
 nshp <- nshp %>%
   rename(Neighbourhood = FIELD_2)
 Final_Table <- left_join(nshp, Final_Table, by = "Neighbourhood")
+
+Final_Table <- Final_Table %>%
+  rename(`_id` = FIELD_1,
+          AREA_ATTR_ID = FIELD_3,
+          PARENT_AREA_ID = FIELD_4,
+          AREA_SHORT_CODE = FIELD_5,
+          AREA_LONG_CODE = FIELD_6,
+          AREA_NAME = FIELD_7,
+          AREA_DESC = FIELD_8,
+          X = FIELD_9,
+          Y = FIELD_10,
+          LONGITUDE = FIELD_11,
+          LATITUDE = FIELD_12,
+          OBJECTID = FIELD_13,
+          Shape__Area = FIELD_14,
+          Shape__Length = FIELD_15)
 ```
 
 ```{r}
