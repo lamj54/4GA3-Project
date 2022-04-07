@@ -146,6 +146,28 @@ Final_Table <- merge(Final_Table, Socioeconomic_variables)
 
 ```{r}
 #Merging shpfile to final table
-neighbourhoods <- left_join(Final_Table, nshp, c("Neighbourhood" = "FIELD_2"))
+nshp <- nshp %>%
+  rename(Neighbourhood = FIELD_2)
+Final_Table <- left_join(nshp, Final_Table, by = "Neighbourhood")
 ```
+
+```{r}
+ggplot(data = neighbourhoods) +
+  geom_sf(aes(fill = total_population)) + 
+  scale_fill_distiller(name = "Total Population",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  theme_minimal()
+```
+
+```{r}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = fold_increase)) + 
+  scale_fill_distiller(name = "Fold Increase",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  theme_minimal()
+```
+
+
 
