@@ -32,7 +32,7 @@ Unclear for now. While lower incomes may be more limited in what preventative me
 
 # Analysis Plan
 
-Chapter 19-26 deal with seeing if a single variable is random or not, while chapters 27-31 deal with regression analysis. For initial data exploration, we can use content from 19-26 like choropleth maps, SMAs and Moran’s I to explore each variable (e.g., see if the individual variables are random or not). For the actual data analysis, we do regression (start off simple with linear regression, content from 27/28), test the model’s residuals for randomness (use Moran’s I test + plotting them). If not random, redo the model and repeat the previous steps (Remedial action, covered in 27/29).
+Chapters 19-26 deal with seeing if a single variable is random or not, while chapters 27-31 deal with regression analysis. For initial data exploration, we can use content from 19-26 like choropleth maps, SMAs and Moran’s I to explore the independent variable (e.g., see if it is random or not) + visualize the dependent variables w/ maps. For the actual data analysis, we do regression (start off simple with linear regression, content from 27/28), test the model’s residuals for randomness (use Moran’s I test + plotting them). If not random, redo the model (using remedial action, covered in 27/29), test the residuals, and repeat the previous steps if they're not random.
 
 ## Breakdown of Relevant Textbook Chapters 
 
