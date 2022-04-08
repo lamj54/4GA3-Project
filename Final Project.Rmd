@@ -1,5 +1,5 @@
 ---
-title: ""
+title: "Income as a Determinant of the Speed of Transmission: Study of the Thrid Wave of SARS-CoV-2 in Toronto, Ontario"
 #subtitle: "A subtitle"
 thanks: ""
 author:
@@ -38,8 +38,6 @@ knitr::write_bib(file = 'packages.bib')
 ```
 
 ```{r read-census-data, include=FALSE}
-income_fip <- read_excel("data/income.fip.xlsx")
-education_ky <- read_excel("data/education_ky.xlsx")
 ```
 
 <!--This create a page break, i.e., starts a new page-->
@@ -52,9 +50,15 @@ To cite references in your bibliography.bib file, use [@item] if you want it to 
 
 # Introduction
 
+- Describe the when COVID first cases in Toronto, 
+- First and Second wave, policy the government implemented 
+- What lead to the third wave 
+  - Relaxing of restrictions 
+  - Emergence of Omnicron 
 
 # Study area
 
+*varaible* and COVID-19 incident was examined at the neighbourhood level for the City of Toronto. In total there are 140 unique areas. There were created by City of Toronto to help government and other planning oganizations with obtaining socio-economic data. The boundaries are based around the Canadian Census Tracks. Each niehgbourhood may contain between two to five census tracts. [@Toronto_2017]
 
 # Data
 
@@ -65,12 +69,10 @@ To cite references in your bibliography.bib file, use [@item] if you want it to 
 # Results
 
 
-
 # Analysis
 
 
 # Conclusion
-
 
 
 # References
