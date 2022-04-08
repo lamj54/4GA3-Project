@@ -1,3 +1,24 @@
+# Prof Comments
+- dependent variable
+    - looking at one pandemic w/in a series
+    - our data starts at "baseline" and stops at/right before the peak (last week of December); starts to go down in January 
+    - outcome: difference from last value subtracted by initial value, by neighbourhood
+    - number of cases/population (rate per 10000) so that is standardized by pop
+    - fold increase used for better visualization
+    - sign tells direction of change, while magnitude tells you how much things have changed/how quickly
+    - looking at the *speed* of growth/change in the number of cases by neighbourhood
+    - so when looking at indep variables, a negative relationship means that it dampens the growth of cases, while a positive relationship means that it speeds up the growth
+- independent variables
+    - look at research and include known predictor variables that were already studied
+    - add other variables that may not have been done that you think may be interesting
+    - consider doing income squared (cases increase more rapidly for low income people, while slowing down for higher income people)
+    - unemployment rate is also of interest since it means people may not have to go out
+    - population density can also be included (non-linear relationship, perhaps quadratic: low density gives protection, and also high-density too because of risk compensation, that is people are more careful/compliant with guidelines due to the higher risk)
+    - everything other than the main independent var of interest can be considered controls
+    - good practice to include 4, but use the ones we're interested in
+    - use SEM after the research question has been answered
+- High income people have more means to buy mobility (e.g., buy people to deliver food), which allows them to social distance to a greater extent compared to other people whose income is not as high. As well, high income jobs are usually more accomodating of remote work, etc.
+
 # Variables of Interest
 - Time period: 4 weeks within December 2021; Dec 1-29 (when a big wave of COVID occured)
 - Main predictor: Income (per capita average of all households in a neighbourhood during the specific time period)
