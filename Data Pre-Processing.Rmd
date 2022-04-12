@@ -123,7 +123,9 @@ Final_Table$L_weekrate <- Final_Table$L_weekcases/Final_Table$POP * 10000
 Final_Table$Rate_Change <- Final_Table$L_weekrate - Final_Table$F_weekrate
 
 # Creating fold increase 
-Final_Table$fold_increase <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /Final_Table$F_weekrate 
+## for relative change: Final_Table$fold_increase <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /Final_Table$F_weekrate 
+
+Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate 
 ```
 
 ```{r}

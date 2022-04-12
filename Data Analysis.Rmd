@@ -1,0 +1,485 @@
+---
+title: "Data Analysis"
+output: pdf_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list = ls())
+```
+
+```{r, include=FALSE}
+library(isdas)
+library(spatstat)
+library(tidyverse)
+library(ggplot2)
+library(rgdal)
+library(sf)
+library(dplyr)
+library(plotly)
+library(webshot)
+library(gridExtra)
+library(patchwork)
+library(spdep)
+```
+
+# Data Processing
+
+```{r}
+# Set working directory to the project folder on github
+wd <- getwd()
+
+#import shp file of neighbourhoods
+nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
+st_drivers()
+
+#visualizing shpfile
+ggplot() + 
+  geom_sf(data = nshp, size = 1, color = "black", fill = "red") + 
+  ggtitle("Neighbourhoods") + 
+  coord_sf()
+```
+
+```{r}
+#Deleting the neighbourhood ID from the neighbourhood field for pairing to final table
+
+#Extracting column as matrix
+f2 <- as.matrix(nshp[2])
+
+#deleting geometry field
+f2 <- subset(f2, select = -c(geometry) )
+
+#deleting neighbourhood IDs
+f2 <- gsub("[1234567890()]", " ", f2)
+
+#deleting space after
+f2 <- str_squish(f2)
+
+#rejoining to shp file
+nshp[2] <- f2
+```
+
+```{r}
+#Covid Cases
+covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
+#Neighborhood Data 
+neighbourhood <- read_csv(paste(wd,"/Neighbourhood_POP.csv", sep=""))
+```
+
+```{r}
+chr <- as.character.Date(covidcases$`Episode Date`)
+              
+covidcases$'nd' <-chr 
+
+fweek <- c("2021-12-01","2021-12-02","2021-12-03","2021-12-04","2021-12-05","2021-12-06","2021-12-07")
+lweek <- c("2021-12-25","2021-12-26","2021-12-27","2021-12-28","2021-12-29","2021-12-30","2021-12-31")
+
+fweektb <- subset(covidcases,nd %in% fweek)
+lweektb <- subset(covidcases,nd %in% lweek)
+
+ftab <- as.data.frame(table(fweektb$`Neighbourhood Name`)) 
+ltab <- as.data.frame(table(lweektb$`Neighbourhood Name`)) 
+```
+
+```{r}
+covidcases$`Episode Date`[1]
+```
+
+```{r}
+#This section in creating final_table 
+
+#Neighbourhood_Name, F_weekcases, L_weekcases, POP, F_weekrate,, L_weekrate, Rate_over_month, Case_over_month
+
+#We need to add population for each neighbourhood and join it to the final table 
+
+Neighbourhood <- ftab$Var1
+F_weekcases <- ftab$Freq
+L_weekcases <- ltab$Freq
+Case_over_month <- ltab$Freq - ftab$Freq
+
+#Create Final table 
+Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
+
+```
+
+```{r}
+#3 Neighbourhood are different so there must be an manual correction prior to merging 
+
+neighbourhood$Neighbourhood[128] <- "Weston-Pellam Park"
+neighbourhood$Neighbourhood[16] <- "Briar Hill - Belgravia"
+neighbourhood$Neighbourhood[30] <- "Danforth-East York"
+
+```
+
+```{r}
+#Merge neighbour with final table
+Final_Table <- merge(Final_Table, neighbourhood)
+
+# Creating the case rates per 10,000  
+Final_Table$F_weekrate <- Final_Table$F_weekcases/Final_Table$POP * 10000
+Final_Table$L_weekrate <- Final_Table$L_weekcases/Final_Table$POP * 10000
+
+# Creating rate change 
+Final_Table$Rate_Change <- Final_Table$L_weekrate - Final_Table$F_weekrate
+
+# Creating fold increase 
+Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate 
+```
+
+```{r}
+#Neighbourhood Income Data
+Socioeconomic_variables <- read_csv(paste(wd,"/Neighbourhoods_socioeconomic_variables.csv", sep=""))
+
+```
+```{r}
+#3 neighbourhoods are different so there must be an manual correction prior to merging 
+Socioeconomic_variables$Neighbourhood[128] <- "Weston-Pellam Park"
+Socioeconomic_variables$Neighbourhood[16] <- "Briar Hill - Belgravia"
+Socioeconomic_variables$Neighbourhood[30] <- "Danforth-East York"
+```
+
+```{r}
+#Merge neighbourhood socioeconomic variables data with final table
+Final_Table <- merge(Final_Table, Socioeconomic_variables)
+```
+
+```{r}
+#Merging shpfile to final table
+
+nshp$FIELD_2[22] <- "Danforth-East York"
+nshp$FIELD_2[25] <- "North St. James Town"
+nshp$FIELD_2[93] <- "Mimico (includes Humber Bay Shores)"
+nshp$FIELD_2[114] <- "Briar Hill - Belgravia"
+nshp$FIELD_2[115] <- "Cabbagetown-South St. James Town"
+
+nshp <- nshp %>%
+  rename(Neighbourhood = FIELD_2)
+Final_Table <- left_join(nshp, Final_Table, by = "Neighbourhood")
+
+Final_Table <- Final_Table %>%
+  rename(`_id` = FIELD_1,
+          AREA_ATTR_ID = FIELD_3,
+          PARENT_AREA_ID = FIELD_4,
+          AREA_SHORT_CODE = FIELD_5,
+          AREA_LONG_CODE = FIELD_6,
+          AREA_NAME = FIELD_7,
+          AREA_DESC = FIELD_8,
+          X = FIELD_9,
+          Y = FIELD_10,
+          LONGITUDE = FIELD_11,
+          LATITUDE = FIELD_12,
+          OBJECTID = FIELD_13,
+          Shape__Area = FIELD_14,
+          Shape__Length = FIELD_15)
+
+```
+
+# Data Analysis
+
+## Initial Exploration/Visualization
+
+### Dependent Variable
+```{r}
+# have change in COVID case rates (cases per 10000) between first and last week
+# by difference and fold-change
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = fold_increase)) + 
+  scale_fill_distiller(name = "Fold Change",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  ggtitle("Changes in COVID-19 Rates (Cases per 10,000) from... \n to... in Toronto by Neighbourhood") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+```{r}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = F_weekrate)) + 
+  scale_fill_distiller(name = "Cases Per 10000",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  ggtitle("COVID-19 Cases in Toronto by Neighbourhood \n During the First Week of December 2021") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+```{r}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = L_weekrate)) + 
+  scale_fill_distiller(name = "Cases Per 10000",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  ggtitle("COVID-19 Cases in Toronto by Neighbourhood \n During the Last Week of December 2021") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+# Final_Table$relative_change <- (Final_Table$L_weekrate - Final_Table$F_weekrate) /Final_Table$F_weekrate 
+# 
+# ggplot(data = Final_Table) +
+#   geom_sf(aes(fill = relative_change)) + 
+#   scale_fill_distiller(name = "Relative Change",
+#                        palette = "YlOrRd", 
+#                        direction = 1) +
+#   theme_minimal()
+
+# fold and relative change have similar values
+```
+
+### Independent Variables(s)
+```{r}
+# have average income and proportion of 18-24 y/os
+# population density can be calculated w/ POP and Shape_Area too
+
+# rename column names so it's easier to call
+Final_Table <- Final_Table %>%
+  rename(avg_income = `Average income $ (Total income in 2010 of population aged 15 years and over)`,
+         perc_18_24 = `Percent of Pop Age 18 to 24`)
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = avg_income)) + 
+  scale_fill_distiller(name = "Average Income ($)",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  ggtitle("Average Income in Toronto by Neighbourhood") #maybe adjust this later for detail
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+```{r}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = perc_18_24)) + 
+  scale_fill_distiller(name = "Percentage of Population",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  ggtitle("Percentage of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...)
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+# if we want to try population density
+
+Final_Table$pop_density <- Final_Table$POP / Final_Table$Shape__Area
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = pop_density)) + 
+  scale_fill_distiller(name = "Population Density",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+## Testing Dependent Variable for Randomness
+
+Q: is the pattern of changes in COVID-19 rates random or non-random?
+
+### Spatial Moving Averages
+```{r}
+Final_Table.nb <- poly2nb(pl = Final_Table)
+Final_Table.w <- nb2listw(Final_Table.nb)
+
+fold_increase.sma <- lag.listw(Final_Table.w, Final_Table$fold_increase)
+Final_Table$fold_increase.sma <- fold_increase.sma
+
+# null landscapes
+fold_null1 <- sample(Final_Table$fold_increase)
+fold_null1.sma <- lag.listw(Final_Table.w, fold_null1)
+Final_Table$fold_null1 <- fold_null1
+Final_Table$fold_null1.sma <- fold_null1.sma
+
+fold_null2 <- sample(Final_Table$fold_increase)
+fold_null2.sma <- lag.listw(Final_Table.w, fold_null2)
+Final_Table$fold_null2 <- fold_null2
+Final_Table$fold_null2.sma <- fold_null2.sma
+
+fold_null3 <- sample(Final_Table$fold_increase)
+fold_null3.sma <- lag.listw(Final_Table.w, fold_null3)
+Final_Table$fold_null3 <- fold_null3
+Final_Table$fold_null3.sma <- fold_null3.sma
+
+fold_null4 <- sample(Final_Table$fold_increase)
+fold_null4.sma <- lag.listw(Final_Table.w, fold_null4)
+Final_Table$fold_null4 <- fold_null4
+Final_Table$fold_null4.sma <- fold_null4.sma
+
+fold_null5 <- sample(Final_Table$fold_increase)
+fold_null5.sma <- lag.listw(Final_Table.w, fold_null5)
+Final_Table$fold_null5 <- fold_null5
+Final_Table$fold_null5.sma <- fold_null5.sma
+```
+
+```{r}
+Final_Table2 <- Final_Table %>% 
+  select(fold_increase.sma, 
+         fold_null1.sma,
+         fold_null2.sma,
+         fold_null3.sma,
+         fold_null4.sma,
+         fold_null5.sma,
+         geometry) %>%
+  gather(VAR, fold_sma, -geometry)
+
+Final_Table2 <- Final_Table2 %>%
+  data.frame(Final_Table %>%
+               st_drop_geometry() %>%
+               select(fold_increase,
+                      fold_null1,
+                      fold_null2,
+                      fold_null3,
+                      fold_null4,
+                      fold_null5,) %>% 
+               gather(VAR, fold) %>% 
+               select(fold))
+```
+
+```{r}
+ggplot(data = Final_Table2, aes(x = fold, y = fold_sma, color = VAR)) +
+  geom_point(alpha = 0.1) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  geom_smooth(method = "lm") +
+  coord_equal() +
+  facet_wrap(~ VAR, ncol = 2)
+```
+
+
+### Moran's I
+```{r}
+mp <- moran.plot(Final_Table$fold_increase, Final_Table.w)
+moran.test(Final_Table$fold_increase, Final_Table.w)
+```
+### Local Moran's I
+```{r}
+fold_increase.local <- localmoran(Final_Table$fold_increase, Final_Table.w)
+colnames(fold_increase.local) <- c("Ii", "E.Ii", "Var.Ii", "Z.Ii", "p.val")
+
+Final_Table <- Final_Table %>% 
+  left_join(data.frame(Neighbourhood = Final_Table$Neighbourhood, 
+                       fold_increase.local), 
+            by = "Neighbourhood")
+```
+
+```{r}
+# plot_ly(Final_Table) %>%
+#     add_sf(type = "scatter",
+#            split = ~(p.val < 0.05), 
+#            color = ~Type, 
+#            colors = c("red", 
+#                       "khaki1", 
+#                       "dodgerblue", 
+#                       "dodgerblue4")) 
+```
+
+
+
+## Regression Analysis
+
+Q: what may be making the pattern of changes in COVID-19 rates non-random?
+
+### Model 1: Linear Regression w/ Income
+```{r}
+model1 <- lm(formula = fold_increase ~ avg_income, data = Final_Table)
+summary(model1) 
+```
+
+```{r}
+ggplot(data = Final_Table, aes(x = avg_income, 
+                               y = fold_increase)) + 
+  geom_point() +
+  geom_abline(slope = model1$coefficients[2], 
+              intercept = model1$coefficients[1], 
+              color = "blue", size = 1) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0)
+```
+
+```{r}
+# analyzing the residuals
+
+Final_Table$model1.e <- model1$residuals
+
+plot_ly(Final_Table) %>% 
+  add_sf(type = "scatter",
+         color = ~(model1.e > 0), 
+         colors = c("red", 
+                    "dodgerblue4")) 
+```
+
+```{r}
+moran.test(Final_Table$model1.e, 
+           Final_Table.w)
+```
+
+### Model 2: Inverse Income
+
+```{r}
+Final_Table <- mutate(Final_Table, 
+                      inv_income = 1/avg_income)
+
+model2 <- lm(formula = fold_increase ~ inv_income, 
+             data = Final_Table)
+summary(model2) 
+```
+
+```{r}
+ggplot(data = Final_Table, 
+       aes(x = avg_income, 
+           y = fold_increase)) + 
+  geom_point() +
+  stat_function(fun=function(x)model2$coefficients[1] + model2$coefficients[2]/x, 
+                geom="line", 
+                color = "blue",
+                size = 1) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0)
+```
+```{r}
+Final_Table$model2.e <- model2$residuals
+
+moran.test(Final_Table$model2.e, 
+           Final_Table.w)
+```
+
+### Model 3: Log Fold Increase
+```{r}
+Final_Table <- Final_Table %>%
+  mutate(ln_fold = log(fold_increase)) 
+
+model3 <- lm(formula = ln_fold ~ avg_income, 
+             data = Final_Table)
+
+summary(model3)
+```
+```{r}
+ggplot(data = Final_Table, 
+       aes(x = avg_income, 
+           y = fold_increase)) + 
+  geom_point() +
+  stat_function(fun=function(x)exp(model3$coefficients[1] + model3$coefficients[2] * x), 
+                geom="line", 
+                color = "blue", 
+                size = 1) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0)
+```
+
+```{r}
+Final_Table$model3.e <- model3$residuals
+
+moran.test(Final_Table$model3.e, 
+           Final_Table.w)
+```
+
+
+### Model 4: Linear Regression with Income + 18-24s + Density
+```{r}
+model4 <- lm(formula = fold_increase ~ avg_income + perc_18_24 + pop_density, data = Final_Table)
+summary(model4) 
+```
+
+```{r}
+
+```
+
+
