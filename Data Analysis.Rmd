@@ -478,8 +478,60 @@ model4 <- lm(formula = fold_increase ~ avg_income + perc_18_24 + pop_density, da
 summary(model4) 
 ```
 
-```{r}
+### Model 5: Quadratic Income + Quadratic Density + 18-24 y/os
 
+```{r}
+Final_Table <- Final_Table %>%
+  mutate(quad_income = avg_income**2, 
+         quad_density = pop_density**2)
+
+model5 <- lm(formula = fold_increase ~ quad_income + perc_18_24 + quad_density, data = Final_Table)
+summary(model5) 
+```
+
+## Model 6: Quadratic Income Only
+```{r}
+model6 <- lm(formula = fold_increase ~ quad_income, data = Final_Table)
+summary(model6) 
+
+ggplot(data = Final_Table, 
+       aes(x = avg_income, 
+           y = fold_increase)) + 
+  geom_point() +
+  stat_function(fun=function(x)model6$coefficients[1] + model6$coefficients[2] * x**2, 
+                geom="line", 
+                color = "blue", 
+                size = 1) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0)
+
+Final_Table$model6.e <- model6$residuals
+
+moran.test(Final_Table$model6.e, 
+           Final_Table.w)
+```
+
+### Model 7: Inverse Income, Log Fold Increase
+```{r}
+model7 <- lm(formula = ln_fold ~ inv_income, data = Final_Table)
+summary(model7) 
+
+ggplot(data = Final_Table, 
+       aes(x = avg_income, 
+           y = fold_increase)) + 
+  geom_point() +
+  stat_function(fun=function(x)exp(model7$coefficients[1] + model7$coefficients[2]/x), 
+                geom="line", 
+                color = "blue", 
+                size = 1) +
+  geom_vline(xintercept = 0) + 
+  geom_hline(yintercept = 0) +
+  ylim(c(0,300))
+
+Final_Table$model7.e <- model7$residuals
+
+moran.test(Final_Table$model7.e, 
+           Final_Table.w)
 ```
 
 
