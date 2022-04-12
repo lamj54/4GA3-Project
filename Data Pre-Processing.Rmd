@@ -30,7 +30,7 @@ library(dplyr)
 wd <- getwd()
 
 #import shp file of neighbourhoods
-nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
+nshp <- st_read(paste(wd, "/data/Neighbourhoods.shp", sep = ""))
 st_drivers()
 
 #visualizing shpfile
@@ -61,9 +61,9 @@ nshp[2] <- f2
 
 ```{r}
 #Covid Cases
-covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
+covidcases <- read_csv(paste(wd,"/data/COVID19 cases.csv", sep=""))
 #Neighborhood Data 
-neighbourhood <- read_csv(paste(wd,"/Neighbourhood_POP.csv", sep=""))
+neighbourhood <- read_csv(paste(wd,"/data/Neighbourhood_POP.csv", sep=""))
 ```
 
 

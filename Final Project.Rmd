@@ -1,16 +1,16 @@
 ---
-title: "Income as a Determinant of the Speed of Transmission: Study of the Thrid Wave of SARS-CoV-2 in Toronto, Ontario"
+title: "Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario"
 #subtitle: "A subtitle"
 thanks: ""
 author:
 - name: Jason Lam
   student_number: 400201299
+- name: Emily Fletcher
+  student_number: Syed Hammad Uddin
 - name: 
-  student_number: 
+  student_number: Jenny Chau
 - name: 
-  student_number: 
-- name: 
-  student_number: 
+  student_number: Pierce Bourgeois 
 - name: 
   student_number: 
 subject: "ENVSOCTY 4GA3"
@@ -29,7 +29,13 @@ always_allow_html: true
 
 <!--Chunks of code can have names; the chunk option "include" controls whether the chunk and its output are printed in the final document-->
 ```{r load-packages, include=FALSE}
-
+library(isdas)
+library(spatstat)
+library(tidyverse)
+library(ggplot2)
+library(rgdal)
+library(sf)
+library(dplyr)
 ```
 
 ```{r write-package-bib, include=FALSE}
@@ -55,12 +61,33 @@ To cite references in your bibliography.bib file, use [@item] if you want it to 
 - What lead to the third wave 
   - Relaxing of restrictions 
   - Emergence of Omnicron 
+  
+# Background
 
 # Study area
 
-*varaible* and COVID-19 incident was examined at the neighbourhood level for the City of Toronto. In total there are 140 unique areas. There were created by City of Toronto to help government and other planning oganizations with obtaining socio-economic data. The boundaries are based around the Canadian Census Tracks. Each niehgbourhood may contain between two to five census tracts. [@Toronto_2017]
+Income and change in COVID-19 incident was examined at the neighbourhood level for the City of Toronto (See Figure 1). Toronto was specifically selected because of the availability of both COVID-19 and income at such a fine spatial scale. In total there are 140 unique areas. The large number neighbourhoods enable this study to capture a diverse levels of wealth accross the city. There were created by City of Toronto to help government and other planning oganizations with obtaining socio-economic data. The boundaries are based around the Canadian Census Tracks. Each niehgbourhood may contain between two to five census tracts. [@Toronto_2017]
+
+
+```{r, include=FALSE}
+# Set working directory to the project folder on github
+wd <- getwd()
+
+#import shp file of neighbourhoods
+nshp <- st_read(paste(wd, "/data/Neighbourhoods.shp", sep = ""))
+```
+
+```{r, echo=FALSE, fig.cap = "Neighbourhoods in Toronto, Ontario, Canada"}
+#visualizing shpfile
+ggplot() + 
+  geom_sf(data = nshp, size = 0.6, color = "white", fill = "grey") + 
+  coord_sf(datum = NA) + 
+  theme_void()
+```
 
 # Data
+
+The COVID-19 data was retreived from the City of Torontro Open Data portal. The data was downloaded as a comma-seperated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. For this study the time period of interest is through December 2021, corresponding to the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The variables of this study were also retrieved from Toronto Open Data.
 
 
 # Methods
