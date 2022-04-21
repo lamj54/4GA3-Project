@@ -35,8 +35,8 @@ st_drivers()
 
 #visualizing shpfile
 ggplot() + 
-  geom_sf(data = nshp, size = 1, color = "black", fill = "red") + 
-  ggtitle("Neighbourhoods") + 
+  geom_sf(data = nshp, size = 0.5, color = "black", fill = "#FFFFCC") + 
+  ggtitle("Toronto Neighbourhoods") + 
   coord_sf()
 ```
 
@@ -130,7 +130,7 @@ Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate
 
 ```{r}
 #Neighbourhood Income Data
-Socioeconomic_variables <- read_csv(paste(wd,"/Neighbourhoods_socioeconomic_variables.csv", sep=""))
+Socioeconomic_variables <- read_csv(paste(wd,"/data/Neighbourhoods_socioeconomic_variables.csv", sep=""))
 
 ```
 ```{r}
@@ -170,8 +170,8 @@ Final_Table <- Final_Table %>%
 ```
 
 ```{r}
-ggplot(data = neighbourhoods) +
-  geom_sf(aes(fill = total_population)) + 
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = POP)) + 
   scale_fill_distiller(name = "Total Population",
                        palette = "YlOrRd", 
                        direction = 1) +

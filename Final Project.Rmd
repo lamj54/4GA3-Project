@@ -6,16 +6,16 @@ author:
 - name: Jason Lam
   student_number: 400201299
 - name: Emily Fletcher
-  student_number: Syed Hammad Uddin
-- name: 
-  student_number: Jenny Chau
-- name: 
-  student_number: Pierce Bourgeois 
-- name: 
+  student_number: 400210334
+- name: Syed Hammad Uddin
+  student_number: 
+- name: Jenny Chau
+  student_number: 
+- name: Pierce Bourgeois 
   student_number: 
 subject: "ENVSOCTY 4GA3"
-abstract: "This paper reports our analysis of opioid prescriptions in Kentucky, USA, and its relationship with income and education at the level of counties. Data were obtained from the Washington Post database and the US Census."
-keywords: "opioids, education, income, spatial analysis"
+abstract: ""
+keywords: "Income, Toronto, COVID-19, Spatial Statisitics, Spatial Analysis"
 date: "4/22/2022"
 output:
   pdf_document:
@@ -64,6 +64,13 @@ To cite references in your bibliography.bib file, use [@item] if you want it to 
   
 # Background
 
+A person’s income level affects how they go about their everyday lives. The associated behavioural pattern has been linked to change in health outcomes. Low income for example affects housing condition and leads to more tight housing arrangements. Such factors have been associated in the increased risk of infections for pathogens such as tuberculosis [Khalatbari-Soltani_Cumming_Delpierre_Kelly-Irving_2020].
+In Ontario, from January 21 to June 30, 2022, the most attributed workplace was manufacturing [@Murti_Achonu_Smith_Brown_Kim_Johnson_Ravindran_Buchan_2021]. Manufacturing accounted for 45% of outbreaks which totaled 65% of outbreak cases. Another notable sector was Transport and Warehousing (11% of outbreaks, 8% of outbreak cases).  In Toronto, it has been observed the COVID-19 first infiltrate in high income communities before quickly spreading to lower income communities [@Mishra_Ma_Moloney_Yiu_Darvin_Landsman_Kwong_Calzavara_Straus_Chan_et al._2022].  According to Mishra et al. (2022) lower income neighbourhoods were also defined by their higher dwelling densities and greater proportion of occupation that could not make the remote transition. 
+The first case of COVID-19 in Ontario (and Canada) was reported on January 25, 2020 [@Nielsen_2020]. As the virus began to spread, Ontario entered its first wave of covid-19 on February 26, 2020. The first wave of COVID-19 lasted 188 days, ending on August 31, 2020 [@PHO_2021]. As Ontario began loosening restrictions as part of its 3-stage reopening plan, people started getting together again, and cases began to rise. Ontario’s second wave began September 2020 and ended in February 2021, with cases peaking in January 2021 [@PHO_2021]. The third wave in Ontario was driven by the Alpha (B.1.1.7) variant, which was more transmissible [@Detsky_Bogoch_2021] The third wave lasted from March to July 2021, and was the largest wave yet, with the peak number of new cases in a day in Ontario being 5067 [@PHO_2022]. The emergence of the Delta variant (B.1.617.2) caused a smaller and shorter fourth wave in Ontario that lasted from August to October 2021. The largest number of new cases reported in a day in Ontario during the fourth wave was 878.  
+
+The fifth wave of the pandemic lasted from the beginning of December 2021 till mid-February 2022. The catalyst for this was the emergence of a new, highly transmissible variant called Omicron. The variant, which was first reported globally in November 2021, has been thoroughly researched due to its scale and rate of infection. This research suggests that the variant is highly transmissible due to several factors. This includes the fact that Omicron is more likely to evade immunity from a previous infection, meaning that there is a high chance that you can get re-infected with COVID-19 [@Pulliam_Schalkwyk_Govender_Gottberg_Cohen_Groome_Dushoff_Mlisana_Moultrie_2021]. This is an alarming number which is also supported by other research suggesting that the variant is up to 3.7% more infectious among vaccinated citizens than its predecessors [@Mohsin_Mahmud_2022]. In the period it was active, it became the dominant strain and was responsible for 95% infections globally. In Ontario, the first Omicron cases were reported on November 28, 2021 [@GofO]. During the Omicron wave, the highest number of cases for a single day in the province were 19,373 [@PHO_2022]. This study will look at this period of Omicron specifically in the City of Toronto. The city is the densest urban core in the province and is one of the most densely populated regions in North America. This has made it a large target of COVID-19 with the city dealing with its consequences since the pandemic began. In fact, till date there have been more than 300,000 reported cases with more than 4000 deaths [@Toronto_2021] .
+
+
 # Study area
 
 Income and change in COVID-19 incident was examined at the neighbourhood level for the City of Toronto (See Figure 1). Toronto was specifically selected because of the availability of both COVID-19 and income at such a fine spatial scale. In total there are 140 unique areas. The large number neighbourhoods enable this study to capture a diverse levels of wealth accross the city. There were created by City of Toronto to help government and other planning oganizations with obtaining socio-economic data. The boundaries are based around the Canadian Census Tracks. Each niehgbourhood may contain between two to five census tracts. [@Toronto_2017]
@@ -87,7 +94,7 @@ ggplot() +
 
 # Data
 
-The COVID-19 data was retreived from the City of Torontro Open Data portal. The data was downloaded as a comma-seperated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. For this study the time period of interest is through December 2021, corresponding to the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The variables of this study were also retrieved from Toronto Open Data.
+The COVID-19 data was retreived from the City of Torontro Open Data portal [@TPH_2022]. The data was downloaded as a comma-seperated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. For this study the time period of interest is through December 2021, corresponding to the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The income data used in this study were also retrieved from Toronto Open Data and come from a neihgbourhood profile which contains an assortment of other socio-economic variables [@TSDFA_2011].
 
 
 # Methods
