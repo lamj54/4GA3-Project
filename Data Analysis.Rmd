@@ -32,7 +32,7 @@ library(spdep)
 wd <- getwd()
 
 #import shp file of neighbourhoods
-nshp <- st_read(paste(wd, "/Neighbourhoods.shp", sep = ""))
+nshp <- st_read(paste(wd, "/data/Neighbourhoods.shp", sep = ""))
 st_drivers()
 
 #visualizing shpfile
@@ -63,9 +63,9 @@ nshp[2] <- f2
 
 ```{r}
 #Covid Cases
-covidcases <- read_csv(paste(wd,"/COVID19 cases.csv", sep=""))
+covidcases <- read_csv(paste(wd,"/data/COVID19 cases.csv", sep=""))
 #Neighborhood Data 
-neighbourhood <- read_csv(paste(wd,"/Neighbourhood_POP.csv", sep=""))
+neighbourhood <- read_csv(paste(wd,"/data/Neighbourhood_POP.csv", sep=""))
 ```
 
 ```{r}
@@ -130,7 +130,7 @@ Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate
 
 ```{r}
 #Neighbourhood Income Data
-Socioeconomic_variables <- read_csv(paste(wd,"/Neighbourhoods_socioeconomic_variables.csv", sep=""))
+Socioeconomic_variables <- read_csv(paste(wd,"/data/Neighbourhoods_socioeconomic_variables.csv", sep=""))
 
 ```
 ```{r}
@@ -190,7 +190,7 @@ ggplot(data = Final_Table) +
   scale_fill_distiller(name = "Fold Change",
                        palette = "YlOrRd", 
                        direction = 1) +
-  ggtitle("Changes in COVID-19 Rates (Cases per 10,000) from... \n to... in Toronto by Neighbourhood") +
+  ggtitle("Change in COVID-19 Rates (Cases per 10,000) Between the First and \n Last Week of December 2021 in Toronto by Neighbourhood") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -250,10 +250,10 @@ ggplot(data = Final_Table) +
 ```{r}
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = perc_18_24)) + 
-  scale_fill_distiller(name = "Percentage of Population",
+  scale_fill_distiller(name = "Population Percentage",
                        palette = "YlOrRd", 
                        direction = 1) +
-  ggtitle("Percentage of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...)
+  ggtitle("Proportion of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...)
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -477,6 +477,13 @@ moran.test(Final_Table$model3.e,
 model4 <- lm(formula = fold_increase ~ avg_income + perc_18_24 + pop_density, data = Final_Table)
 summary(model4) 
 ```
+```{r}
+Final_Table$model4.e <- model4$residuals
+
+moran.test(Final_Table$model4.e, 
+           Final_Table.w)
+```
+
 
 ### Model 5: Quadratic Income + Quadratic Density + 18-24 y/os
 
