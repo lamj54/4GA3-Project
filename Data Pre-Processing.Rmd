@@ -1,6 +1,6 @@
 ---
 title: "Data Pre-Processing"
-author: "Jason Lam"
+author: "Jason Lam, Emily Fletcher, Syed Hammad Uddin, Jenny Chau, Pierce Bourgeois"
 date: "25/03/2022"
 output: pdf_document
 ---
@@ -133,6 +133,7 @@ Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate
 Socioeconomic_variables <- read_csv(paste(wd,"/data/Neighbourhoods_socioeconomic_variables.csv", sep=""))
 
 ```
+
 ```{r}
 #3 Neighbourhood are different so there must be an manual correction prior to merging 
 Socioeconomic_variables$Neighbourhood[128] <- "Weston-Pellam Park"
