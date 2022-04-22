@@ -39,6 +39,7 @@ library(dplyr)
 library(gridExtra)
 library(patchwork)
 library(spdep)
+library(stargazer)
 ```
 
 ```{r write-package-bib, include=FALSE}
@@ -120,11 +121,9 @@ The COVID-19 data was retrieved from the City of Toronto Open Data portal [@TPH_
 
 # Methods
 
-This study used RStudio to conduct both the data pre-processing, that is cleaning of the original datasets, as well as the analysis. 
+This study used RStudio to conduct the data pre-processing, that is cleaning of the original datasets. A unique method was ran to covered the date data in the COVID-19 case table into character data type. This was so the records could be parsed in respect to this studies period of interest. 
 
-The analysis was done using several R packages, including spatstat, tidyverse, ggplot2, dplyr, webshot, gridExtra, patchwork, and spdep to analyze the area data and find a potential relationship between the chosen independent variables () and the dependent variable () for the city of Toronto. For the initial visualization and analysis of the area data, choropleth maps and Moran’s I were used to identify patterns in the data. Then, to gain more insight on the process behind these patterns, regression analysis was used to determine the relationship between the independent and dependent variables.
-
-A unique method was ran to covered the date data in the COVID-19 case table into character data type. This was so the records could be parsed in respect to this studies period of interest. 
+The analysis was also done in RStudio using several R packages, including spatstat, tidyverse, ggplot2, dplyr, gridExtra, patchwork, and spdep to analyze the area data and find a potential relationship between the chosen independent variables (mainly average income, as well as percentage of 18-24 year old individuals and population density) and the dependent variable (fold change in COVID-19 case rates from the first to last week of December 2021) for the neighbourhoods of Toronto. For the initial visualization and analysis of the area data, choropleth maps and Moran’s I were used to identify patterns in the data. Then, to gain more insight on the process behind these patterns, regression analysis was used to determine the relationship between the independent and dependent variables.
 
 This document was also written and exported through R-Markdown with minimal adaptation from Steven V. Miller's template for academic manuscripts. See: [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/)[https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex] and (https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex)
 
@@ -277,7 +276,6 @@ Final_Table <- Final_Table %>%
 Final_Table$pop_density <- Final_Table$POP / Final_Table$Shape__Area
 ```
 
-
 # Analysis
 
 ## Data Exploration
@@ -322,12 +320,11 @@ Neighbourhoods with greater average income appear darker in colour on the map in
 
 From a visual comparison of Figures 2 and 3, it looks like the neighbourhoods with higher average incomes have lower fold changes in COVID-19 case rates while the neighbourhoods with high fold changes are those with lower average incomes. 
 
-
 ```{r, echo = FALSE, fig.cap = The population density of each of Toronto’s neighbourhoods}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = pop_density)) + 
-  scale_fill_distiller(name = "People per sqaure km",
+  scale_fill_distiller(name = "People per square km",
                        palette = "YlOrRd", 
                        direction = 1) +
   theme_minimal() + 
@@ -335,7 +332,6 @@ ggplot(data = Final_Table) +
 ```
 
 From Figure 4, it seems that there may be a greater population density in neighbourhoods located towards the southern and northeastern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city.
-[insert choropleth map for population prop]
 
 ```{r, echo = FALSE, fig.cap = "The proportion of 18- to 24-year-old individuals in Toronto by neighbourhood"}
 ggplot(data = Final_Table) +
@@ -351,19 +347,115 @@ ggplot(data = Final_Table) +
 Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. 
 
 ## Spatial autocorrelation
+
 Before doing a regression analysis to determine the relationship between the change in COVID-19 case rates and the predictor variables, an analysis of the pattern in the change in COVID-19 case rates must first be done. If its pattern is non-random, then regression analysis can be used to provide more information about the process that is creating this pattern.
 
 To test whether a spatial pattern is random or non-random, Moran’s I, a coefficient of spatial autocorrelation, can be calculated and used in a hypothesis test that assesses for spatial randomness. The null hypothesis of this test is that the pattern is spatially random. The results of the Moran’s I test on the change in COVID-19 case rates can be seen in Figure 6.
 
-```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the change in COVID-19 case rates between the first and last week of December 2021 in Toronto."}
+```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the change in COVID-19 case rates between the first and last week of December 2021 in Toronto"}
 
 moran.test(Final_Table$fold_increase, Final_Table.w)
 ```
 
 From Figure 6, the Moran’s I statistic for this data is 0.089308782 and the p-value of the test is 0.01787. Since the p-value is less than 0.05, it is sufficiently small enough to reject the null hypothesis with a high degree of confidence. This means that the change in COVID-19 case rates is spatially autocorrelated, not spatially random. As well, since the Moran’s I statistic is positive, it suggests that it is a non-random spatial pattern where high values tend to be with other high values, and low values tend to be with other low values. This agrees with the visual observation of the choropleth map of the change in COVID-19 case rates in Figure 2. 
 
+```{r, include = FALSE}
+# calculating local Moran's stats and joining them to the table
+fold_increase.local <- localmoran(Final_Table$fold_increase, Final_Table.w)
+
+colnames(fold_increase.local) <- c("Ii", "E.Ii", "Var.Ii", "Z.Ii", "p.val")
+
+Final_Table <- Final_Table %>% 
+  left_join(data.frame(Neighbourhood = Final_Table$Neighbourhood, 
+                       fold_increase.local), 
+            by = "Neighbourhood")
+```
+
+```{r, include = FALSE}
+# calculating mean-centered values and SMA to categorize neighbourhoods
+Final_Table <- Final_Table %>% 
+  mutate(Z = (fold_increase - mean(fold_increase)) / var(fold_increase), 
+         SMA = lag.listw(Final_Table.w, Z), 
+         significance = p.val <= 0.05,
+         Type = case_when((Z > 0 & SMA > 0) & significance == TRUE ~ "HH significant",
+                          (Z > 0 & SMA > 0) & significance == FALSE ~ "HH not significant",
+                          (Z < 0 & SMA < 0) & significance == TRUE ~ "LL significant",
+                          (Z < 0 & SMA < 0) & significance == FALSE ~ "LL not significant",
+                          (Z * SMA < 0) & significance == TRUE ~ "HL/LH significant",
+                          (Z * SMA < 0) & significance == FALSE ~ "HL/LH not significant"))
+```
+
+```{r, echo = FALSE, fig.cap = "The categorization of neighbourhoods based on local Moran's I, a statistic that describes the autocorrelation of a specific location and its contribution to the global Moran's I statistic."}
+
+ggplot(Final_Table) +
+  geom_sf(aes(fill = Type)) + 
+  scale_fill_manual(values = c("HH significant" = "red", 
+                               "HH not significant" = "darksalmon",
+                               "LL significant" = "dodgerblue",
+                               "LL not significant" = "lightskyblue",
+                               "HL/LH significant" = "ivory4",
+                               "HL/LH not significant" = "gray")) +
+  theme_void() 
+```
+
+Correspondingly, the map of local Moran’s I, which breaks down Moran’s I to examine the contribution of each area to the statistic, in Figure 7, shows that neighbourhoods with high fold changes are surrounded by other neighbourhoods that have high fold changes as well. Such regions are labelled “HH” for “High-High”. On the other hand, the neighbourhoods with low fold changes in COVID-19 case rates are surrounded by those with similarly low fold changes, which are labelled “LL” for “Low-Low”. Other possible combinations are “HL” and “LH” (“High-Low” and “Low-High”). Categorizing each neighbourhood in this way, in addition to showing whether a neighbourhood’s local Moran’s I is statistically significant and thus spatially autocorrelated, reveals the hot spots and cold spots that contribute significantly to the global Moran’s I statistic. From Figure 7, it can be seen that there are several hot spots where COVID-19 case rates have increased significantly, displayed in bright red on the map.
+
+## Regression Analysis
+
+### Results of the Model
+Now knowing that the change in COVID-19 case rates in Toronto’s neighbourhoods is not spatially random, the question is what is the process behind the creation of this pattern? To gain more insight on this, a regression analysis can be used to determine the relationship between several independent variables and the changes in COVID-19 case rate.
+
+```{r, echo = FALSE}
+
+model1 <- lm(formula = fold_increase ~ avg_income + perc_18_24 + pop_density, data = Final_Table)
+
+stargazer(model1, 
+          header = FALSE,
+          title = "Linear regression model of fold change in COVID-19 case rates with respect to income, percentage of 18- to 24-year-old individuals, and population density", 
+          covariate.labels = c("Intercept, Average Income, Percentage of 18-24 year olds, Population Density"),
+          t.auto = FALSE,
+          p.auto = FALSE,
+          df = TRUE,
+          keep.stat = c("adj.rsq", "f", "n", "res.dev", "rsq", "ser"))
+```
+
+As seen in the results of the regression model in Table 2, the only independent variable that is statistically significant in the model is the average income of a neighbourhood. This is because the p-values for average income, percentage of individuals aged 18-24, and population in this model are 0.00496, 0.36353, and 0.65962 respectively. They indicate whether or not the null hypothesis, which states that a variable is not statistically significant in the regression model, should be rejected or not. Since the p-value for average income is less than 0.05, it is small enough to reject the null hypothesis with a high degree of confidence. This means that average income helps to explain the variance in the dependent variable, the change in COVID-19 case rates. On the other hand, the p-values for percentage of 18- to 24-year-old individuals and population density are large, leading to the null hypothesis being accepted. As a result, these two variables do not contribute significantly to the model. This result suggests that average income is a factor that influences the pattern of changes in COVID-19 case rates across Toronto's neighbourhoods, while the percentage of 18- to 24-years-old individuals and population density are not.
+
+Moreover, Table 2 shows that the coefficient for average income is approximately -0.0003 (0.0002591 exactly), indicating that neighbourhoods with higher average incomes have smaller changes in COVID-19 case rates. This agrees with our initial hypothesis. Individuals with lower income tend to have less means to protect themselves from COVID-19, such as with lower income jobs being less accommodating of remote work.
+
+### Model Diagnostics
+
+To determine whether the model has successfully retrieved all of the systematic pattern, its residuals need to be analyzed for randomness. If the residuals are non-random, this means that the model has failed to capture the entire pattern and must be adjusted to have random residuals.
+
+The residuals can first be visualized with a map by plotting the sign of the residual for each neighbourhood (Figure 8). A positive residual indicates that the model overestimates the change in COVID-19 case rates, while a negative residual means that the model underestimates it.
+
+```{r, echo = FALSE, fig.cap = "Map of the sign of the residuals from the regression model for each neighbourhood"}
+Final_Table <- Final_Table %>%
+  mutate(residual_type = ifelse(model1$residuals > 0,
+                                "Positive",
+                                "Negative"))
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = residual_type)) +
+  scale_fill_manual(name = "Residual Sign", values = c("Positive" = "darksalmon",
+                               "Negative" = "lightskyblue")) +
+  theme_void() 
+```
+
+From a visual observation of Figure 8, there does not appear to be any obvious clusters of positive or negative residuals. To obtain a more concrete conclusion, the Moran's I coefficient can be used in a hypothesis test again to test for spatial randomness.
+
+```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the residuals of the regression model"}
+Final_Table$model1.e <- model1$residuals
+
+moran.test(Final_Table$model1.e, 
+           Final_Table.w)
+```
+In Figure 9, the result of the Moran's I hypothesis test supports the visual observation of Figure 8. The null hypothesis of the test is that the pattern analyzed is spatially random. The p-value is 0.1871, which is greater than 0.05 and thus large enough to accept the null hypothesis. Consequently, the residuals of this regression model is random, indicating that the model successfully capture all of the pattern within the changes in COVID-19 case rates across Toronto's neighbourhoods. This means that the model does not need to be adjusted since its assumption that the residuals are independent has not been violated, so the results obtained from the model (summarized in Table 2) are valid.
+
 # Conclusion
 
-This study shows that there is a clear connection between a lower-income status and the incidence rates of the COVID-19. The results show that other socio-economic factors, such as age or population density did not have a clear connection with the data currently available. Socio-economic factors are therefore complex factors that need to be further explored. Identifying these groups from a socio-economic perspective is the first step to establishing that a person’s SEP may be as much of an indicator in predicting health outcomes as a pre-existing medical condition. In establishing such similarities, governing healthcare bodies may extend precautionary recommendations to people with specific socio-economic conditions, thus providing a more in-depth and informed disease prevention plan. In a pursuit of identifying groups of the populations who are more susceptible to poorer outcomes when combating health problems, more research needs to be undertaken. 
+Overall, the changes in COVID-19 case rates across neighbourhoods in Toronto show spatial autocorrelation, as found using Moran's I. A regression analysis of the change in COVID-19 case rates with respect to average income, percentage of 18- to 24-year-old individuals, and population density was also done. It revealed that there is a connection between average income and changes in the rates of COVID-19 cases, with neighbourhoods with lower income having greater changes in COVID-19 case rates. In addition, the results of the regression show that other socio-economic factors, the percentage of 18- to 24-year olds and the population density in a neighbourhood, did not have a clear connection with the COVID-19 case changes. It is recommended that, for the future, more research should be done on the relationship with socio-economic variables and changes in COVID-19 cases. Socio-economic factors are complex factors that need to be further explored to verify the relationships found in this study. 
+
+Identifying groups of individuals from a socio-economic perspective is the first step to establishing that a person’s socioeconomic position may be as much of an indicator in predicting health outcomes as a pre-existing medical condition. In establishing such similarities, governing healthcare bodies may extend precautionary recommendations to people with specific socio-economic conditions, thus providing a more in-depth and informed disease prevention plan. In a pursuit of identifying groups of the populations who are more susceptible to poorer outcomes when combating health problems, more research in this area needs to be undertaken. 
 
 # References
