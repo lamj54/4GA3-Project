@@ -122,8 +122,7 @@ ggplot() +
 
 # Data 
 
-The COVID-19 data was retrieved from the City of Toronto Open Data portal [@TPH_2022]. The data was downloaded as a comma-separated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. The time period of interest was December 2021, corresponding to a peak in COVID-19 cases within the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The case rate (cases per 10000) were calculated for both weeks, and then the difference between the two values was taken to represent the change in COVID-19 case rates for each neighbouthood. The socio-economic data used in this study was also retrieved from Toronto Open Data and comes from a neighbourhood profile dataset [@TSDFA_2011].
-
+The shapefile used to delineate and map Toronto's neighbourhoods in this study was obtained from the "Neighbourhoods" file in the City of Toronto Open Data portal. Using the same portal, the COVID-19 data was retrieved from the dataset "COVID-19 Cases in Toronto" [@TPH_2022]. The data was downloaded as a comma-separated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. The time period of interest was December 2021, corresponding to a peak in COVID-19 cases within the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The average income, percentage of youth (18-24), and population density of each neighbourhood that was used in this study was derived from data in the "Neighbourhood Profile" dataset retrieved from Toronto Open Data [@TSDFA_2011]. This dataset documents demographic and socioeconomic information for each of Toronto's neighbourhoods, including total population and the number of people of each age, using Canada's census data held every 5 years.
 
 # Methods
 
@@ -247,6 +246,18 @@ Final_Table <- merge(Final_Table, Socioeconomic_variables)
 ```
 
 ```{r, include = FALSE}
+#Neighbourhood Area Data
+Neighbourhood_area <- read_csv(paste(wd,"/data/Neighbourhood_area.csv", sep=""))
+
+Neighbourhood_area$Neighbourhood[128] <- "Weston-Pellam Park"
+Neighbourhood_area$Neighbourhood[16] <- "Briar Hill - Belgravia"
+Neighbourhood_area$Neighbourhood[30] <- "Danforth-East York"
+
+Final_Table <- merge(Final_Table, Neighbourhood_area)
+```
+
+
+```{r, include = FALSE}
 #Merging shpfile to final table
 
 nshp$FIELD_2[22] <- "Danforth-East York"
@@ -258,28 +269,18 @@ nshp$FIELD_2[115] <- "Cabbagetown-South St. James Town"
 nshp <- nshp %>%
   rename(Neighbourhood = FIELD_2)
 Final_Table <- left_join(nshp, Final_Table, by = "Neighbourhood")
-
-Final_Table <- Final_Table %>%
-  rename(`_id` = FIELD_1,
-          AREA_ATTR_ID = FIELD_3,
-          PARENT_AREA_ID = FIELD_4,
-          AREA_SHORT_CODE = FIELD_5,
-          AREA_LONG_CODE = FIELD_6,
-          AREA_NAME = FIELD_7,
-          AREA_DESC = FIELD_8,
-          X = FIELD_9,
-          Y = FIELD_10,
-          LONGITUDE = FIELD_11,
-          LATITUDE = FIELD_12,
-          OBJECTID = FIELD_13,
-          Shape__Area = FIELD_14,
-          Shape__Length = FIELD_15)
-
 ```
 
 ```{r, include = FALSE}
 # to calculate population density
-Final_Table$pop_density <- Final_Table$POP / Final_Table$Shape__Area
+Final_Table$pop_density <- Final_Table$POP / Final_Table$Area
+```
+
+```{r, include = FALSE}
+# rename column names so it's easier to call
+Final_Table <- Final_Table %>%
+  rename(avg_income = `Average income $ (Total income in 2010 of population aged 15 years and over)`,
+         perc_18_24 = `Percent of Pop Age 18 to 24`)
 ```
 
 # Analysis
@@ -303,13 +304,6 @@ ggplot(data = Final_Table) +
 ```
 
 In Figure 2, it can be seen that the fold change for all neighbourhoods in Toronto is positive, indicating that they all experienced an increase in COVID-19 case rates in the last week of December 2021 compared to the first week of December 2021. In particular, the neighbourhoods coloured in a darker red and orange showed a significantly large fold change in COVID-19 rates in comparison to other neighbourhoods, which possibly signifies the location of COVID-19 hotspots during December 2021. Accordingly, the neighbourhoods located close to such spots seem to have relatively large fold changes as well, as shown through their light orange colour. Neighbourhoods with smaller fold changes, seen in yellow in the map, appear to be located further away from areas with more intense fold changes.
-
-```{r, include = FALSE}
-# rename column names so it's easier to call
-Final_Table <- Final_Table %>%
-  rename(avg_income = `Average income $ (Total income in 2010 of population aged 15 years and over)`,
-         perc_18_24 = `Percent of Pop Age 18 to 24`)
-```
 
 ```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood"}
 ggplot(data = Final_Table) +
@@ -337,7 +331,7 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-From Figure 4, it seems that there may be a greater population density in neighbourhoods located towards the southern and northeastern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city.
+From Figure 4, it seems that there may be a greater population density in some of the neighbourhoods located towards the southern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city. Comparing Figures 2 and 4, the neighbourhoods with very large fold changes do not have particularly high population densities, and the neighbourhoods with high population densities do not seem to have very high fold changes. Neighbourhoods with similar population densities appear to have different changes in COVID-19 case rates, which may indicate that its relationship with population density is very weak.
 
 ```{r, echo = FALSE, fig.cap = "The proportion of 18- to 24-year-old individuals in Toronto by neighbourhood"}
 ggplot(data = Final_Table) +
@@ -349,8 +343,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. 
+Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates.   
 
 ## Spatial autocorrelation
 
@@ -425,7 +418,7 @@ stargazer(model1,
           keep.stat = c("adj.rsq", "f", "n", "res.dev", "rsq", "ser"))
 ```
 
-As seen in the results of the regression model in Table 2, the only independent variable that is statistically significant in the model is the average income of a neighbourhood. This is because the p-values for average income, percentage of individuals aged 18-24, and population in this model are 0.00496, 0.36353, and 0.65962 respectively. They indicate whether or not the null hypothesis, which states that a variable is not statistically significant in the regression model, should be rejected or not. Since the p-value for average income is less than 0.05, it is small enough to reject the null hypothesis with a high degree of confidence. This means that average income helps to explain the variance in the dependent variable, the change in COVID-19 case rates. On the other hand, the p-values for percentage of 18- to 24-year-old individuals and population density are large, leading to the null hypothesis being accepted. As a result, these two variables do not contribute significantly to the model. This result suggests that average income is a factor that influences the pattern of changes in COVID-19 case rates across Toronto's neighbourhoods, while the percentage of 18- to 24-years-old individuals and population density are not.
+As seen in the results of the regression model in Table 2, the only independent variable that is statistically significant in the model is the average income of a neighbourhood. This is because the p-values for average income, percentage of individuals aged 18-24, and population in this model are 0.00462, 0.38397, and 0.28312 respectively. They indicate whether or not the null hypothesis, which states that a variable is not statistically significant in the regression model, should be rejected or not. Since the p-value for average income is less than 0.05, it is small enough to reject the null hypothesis with a high degree of confidence. This means that average income helps to explain the variance in the dependent variable, the change in COVID-19 case rates. On the other hand, the p-values for percentage of 18- to 24-year-old individuals and population density are large, leading to the null hypothesis being accepted. As a result, these two variables do not contribute significantly to the model. This result suggests that average income is a factor that influences the pattern of changes in COVID-19 case rates across Toronto's neighbourhoods, while the percentage of 18- to 24-years-old individuals and population density are not.
 
 Moreover, Table 2 shows that the coefficient for average income is approximately -0.0003 (0.0002591 exactly), indicating that neighbourhoods with higher average incomes have smaller changes in COVID-19 case rates. Thus, higher income causes the growth in COVID-19 cases to slow, while lower income causes the growth in COVID-19 cases to accelerate. This agrees with our initial hypothesis. Individuals with lower income tend to have less means to protect themselves from COVID-19, due to factors such as lower income jobs being less accommodating of remote work.
 
