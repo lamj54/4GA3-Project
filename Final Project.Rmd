@@ -122,7 +122,7 @@ ggplot() +
 
 # Data 
 
-The shapefile used to delineate and map Toronto's neighbourhoods in this study was obtained from the "Neighbourhoods" file in the City of Toronto Open Data portal. Using the same portal, the COVID-19 data was retrieved from the dataset "COVID-19 Cases in Toronto" [@TPH_2022]. The data was downloaded as a comma-separated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. The time period of interest was December 2021, corresponding to a peak in COVID-19 cases within the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The average income, percentage of youth (18-24), and population density of each neighbourhood that was used in this study was derived from data in the "Neighbourhood Profile" dataset retrieved from Toronto Open Data [@TSDFA_2011]. This dataset documents demographic and socioeconomic information for each of Toronto's neighbourhoods, including total population and the number of people of each age, using Canada's census data held every 5 years.
+The shapefile used to delineate and map Toronto's neighbourhoods in this study was obtained from the "Neighbourhoods" file in the City of Toronto Open Data portal [@Toronto_2022]. Using the same portal, the COVID-19 data was retrieved from the dataset "COVID-19 Cases in Toronto" [@TPH_2022]. The data was downloaded as a comma-separated values (CSV) file. This data is updated weekly by the city and reports each individual case as a record. The time period of interest was December 2021, corresponding to a peak in COVID-19 cases within the fifth wave of the pandemic in Ontario. The cases from the first week of December 2021 (Dec. 1 - Dec. 7) and the last week (Dec. 25 - Dec. 31) were filtered out and aggregated by neighbourhood. The average income, percentage of youth (18-24), and population density of each neighbourhood that was used in this study was derived from data in the "Neighbourhood Profile" dataset retrieved from Toronto Open Data [@TSDFA_2011]. This dataset documents demographic and socioeconomic information for each of Toronto's neighbourhoods, including total population and the number of people of each age, using Canada's census data held every 5 years.
 
 # Methods
 
@@ -283,6 +283,13 @@ Final_Table <- Final_Table %>%
          perc_18_24 = `Percent of Pop Age 18 to 24`)
 ```
 
+```{r, include = FALSE}
+#create a window to use in the analysis
+Final_Table.nb <- poly2nb(pl = Final_Table)
+Final_Table.w <- nb2listw(Final_Table.nb)
+```
+
+
 # Analysis
 
 ## Data Exploration
@@ -303,6 +310,7 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+
 In Figure 2, it can be seen that the fold change for all neighbourhoods in Toronto is positive, indicating that they all experienced an increase in COVID-19 case rates in the last week of December 2021 compared to the first week of December 2021. In particular, the neighbourhoods coloured in a darker red and orange showed a significantly large fold change in COVID-19 rates in comparison to other neighbourhoods, which possibly signifies the location of COVID-19 hotspots during December 2021. Accordingly, the neighbourhoods located close to such spots seem to have relatively large fold changes as well, as shown through their light orange colour. Neighbourhoods with smaller fold changes, seen in yellow in the map, appear to be located further away from areas with more intense fold changes.
 
 ```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood"}
@@ -320,7 +328,7 @@ Neighbourhoods with greater average income appear darker in colour on the map in
 
 From a visual comparison of Figures 2 and 3, it looks like the neighbourhoods with higher average incomes have lower fold changes in COVID-19 case rates while the neighbourhoods with high fold changes are those with lower average incomes. 
 
-```{r, echo = FALSE, fig.cap = The population density of each of Toronto’s neighbourhoods}
+```{r, echo = FALSE, fig.cap = "The population density of each of Toronto’s neighbourhoods"}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = pop_density)) + 
@@ -333,7 +341,7 @@ ggplot(data = Final_Table) +
 
 From Figure 4, it seems that there may be a greater population density in some of the neighbourhoods located towards the southern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city. Comparing Figures 2 and 4, the neighbourhoods with very large fold changes do not have particularly high population densities, and the neighbourhoods with high population densities do not seem to have very high fold changes. Neighbourhoods with similar population densities appear to have different changes in COVID-19 case rates, which may indicate that its relationship with population density is very weak.
 
-```{r, echo = FALSE, fig.cap = "The proportion of 18- to 24-year-old individuals in Toronto by neighbourhood"}
+```{r, echo = FALSE, fig.cap = "The proportion of youth (18 to 24 years old) in Toronto by neighbourhood"}
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = perc_18_24)) + 
   scale_fill_distiller(name = "Population Percentage",
@@ -349,14 +357,14 @@ Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toron
 
 Before doing a regression analysis to determine the relationship between the change in COVID-19 case rates and the predictor variables, an analysis of the pattern in the change in COVID-19 case rates must first be done. If its pattern is non-random, then regression analysis can be used to provide more information about the process that is creating this pattern.
 
-To test whether a spatial pattern is random or non-random, Moran’s I, a coefficient of spatial autocorrelation, can be calculated and used in a hypothesis test that assesses for spatial randomness. The null hypothesis of this test is that the pattern is spatially random. The results of the Moran’s I test on the change in COVID-19 case rates can be seen in Figure 6.
+To test whether a spatial pattern is random or non-random, Moran’s I, a coefficient of spatial autocorrelation, can be calculated and used in a hypothesis test that assesses for spatial randomness. The null hypothesis of this test is that the pattern is spatially random.
 
-```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the change in COVID-19 case rates between the first and last week of December 2021 in Toronto"}
+```{r, include = FALSE}
 
 moran.test(Final_Table$fold_increase, Final_Table.w)
 ```
 
-From Figure 6, the Moran’s I statistic for this data is 0.089308782 and the p-value of the test is 0.01787. Since the p-value is less than 0.05, it is sufficiently small enough to reject the null hypothesis with a high degree of confidence. This means that the change in COVID-19 case rates is spatially autocorrelated, not spatially random. As well, since the Moran’s I statistic is positive, it suggests that it is a non-random spatial pattern where high values tend to be with other high values, and low values tend to be with other low values. This agrees with the visual observation of the choropleth map of the change in COVID-19 case rates in Figure 2. 
+The Moran’s I statistic for this data is 0.089308782 and the p-value of the test is 0.01787. Since the p-value is less than 0.05, it is sufficiently small enough to reject the null hypothesis with a high degree of confidence. This means that the change in COVID-19 case rates is spatially autocorrelated, not spatially random. As well, since the Moran’s I statistic is positive, it suggests that it is a non-random spatial pattern where high values tend to be with other high values, and low values tend to be with other low values. This agrees with the visual observation of the choropleth map of the change in COVID-19 case rates in Figure 2. 
 
 ```{r, include = FALSE}
 # calculating local Moran's stats and joining them to the table
@@ -397,20 +405,20 @@ ggplot(Final_Table) +
   theme_void() 
 ```
 
-Correspondingly, the map of local Moran’s I, which breaks down Moran’s I to examine the contribution of each area to the statistic, in Figure 7, shows that neighbourhoods with high fold changes are surrounded by other neighbourhoods that have high fold changes as well. Such regions are labelled “HH” for “High-High”. On the other hand, the neighbourhoods with low fold changes in COVID-19 case rates are surrounded by those with similarly low fold changes, which are labelled “LL” for “Low-Low”. Other possible combinations are “HL” and “LH” (“High-Low” and “Low-High”). Categorizing each neighbourhood in this way, in addition to showing whether a neighbourhood’s local Moran’s I is statistically significant and thus spatially autocorrelated, reveals the hot spots and cold spots that contribute significantly to the global Moran’s I statistic. From Figure 7, it can be seen that there are several hot spots where COVID-19 case rates have increased significantly, displayed in bright red on the map.
+Correspondingly, the map of local Moran’s I, which breaks down Moran’s I to examine the contribution of each area to the statistic, in Figure 6, shows that neighbourhoods with high fold changes are surrounded by other neighbourhoods that have high fold changes as well. Such regions are labelled “HH” for “High-High”. On the other hand, the neighbourhoods with low fold changes in COVID-19 case rates are surrounded by those with similarly low fold changes, which are labelled “LL” for “Low-Low”. Other possible combinations are “HL” and “LH” (“High-Low” and “Low-High”). Categorizing each neighbourhood in this way, in addition to showing whether a neighbourhood’s local Moran’s I is statistically significant and thus spatially autocorrelated, reveals the hot spots and cold spots that contribute significantly to the global Moran’s I statistic. From Figure 6, it can be seen that there are several hot spots where COVID-19 case rates have increased significantly, displayed in bright red on the map.
 
 ## Regression Analysis
 
 ### Results of the Model
 Now knowing that the change in COVID-19 case rates in Toronto’s neighbourhoods is not spatially random, the question is what is the process behind the creation of this pattern? To gain more insight on this, a regression analysis can be used to determine the relationship between several independent variables and the changes in COVID-19 case rate.
 
-```{r, echo = FALSE}
+```{r, echo=FALSE, message=FALSE, results="asis"}
 
 model1 <- lm(formula = fold_increase ~ avg_income + perc_18_24 + pop_density, data = Final_Table)
 
-stargazer(model1, 
+stargazer(model1,
           header = FALSE,
-          title = "Linear regression model of fold change in COVID-19 case rates with respect to income, percentage of 18- to 24-year-old individuals, and population density", 
+          title = "Linear regression model of fold change in COVID-19 case rates with respect to income, percentage of 18- to 24-year-old individuals, and population density",
           covariate.labels = c("Intercept, Average Income, Percentage of 18-24 year olds, Population Density"),
           t.auto = FALSE,
           p.auto = FALSE,
@@ -426,7 +434,7 @@ Moreover, Table 2 shows that the coefficient for average income is approximately
 
 To determine whether the model has successfully retrieved all of the systematic pattern, its residuals need to be analyzed for randomness. If the residuals are non-random, this means that the model has failed to capture the entire pattern and must be adjusted to have random residuals.
 
-The residuals can first be visualized with a map by plotting the sign of the residual for each neighbourhood (Figure 8). A positive residual indicates that the model overestimates the change in COVID-19 case rates, while a negative residual means that the model underestimates it.
+The residuals can first be visualized with a map by plotting the sign of the residual for each neighbourhood (Figure 7). A positive residual indicates that the model overestimates the change in COVID-19 case rates, while a negative residual means that the model underestimates it.
 
 ```{r, echo = FALSE, fig.cap = "Map of the sign of the residuals from the regression model for each neighbourhood"}
 Final_Table <- Final_Table %>%
@@ -441,15 +449,15 @@ ggplot(data = Final_Table) +
   theme_void() 
 ```
 
-From a visual observation of Figure 8, there does not appear to be any obvious clusters of positive or negative residuals. To obtain a more concrete conclusion, the Moran's I coefficient can be used in a hypothesis test again to test for spatial randomness.
+From a visual observation of Figure 7, there does not appear to be any obvious clusters of positive or negative residuals. To obtain a more concrete conclusion, the Moran's I coefficient can be used in a hypothesis test again to test for spatial randomness.
 
-```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the residuals of the regression model"}
+```{r, include = FALSE}
 Final_Table$model1.e <- model1$residuals
 
 moran.test(Final_Table$model1.e, 
            Final_Table.w)
 ```
-In Figure 9, the result of the Moran's I hypothesis test supports the visual observation of Figure 8. The null hypothesis of the test is that the pattern analyzed is spatially random. The p-value is 0.1871, which is greater than 0.05 and thus large enough to accept the null hypothesis. Consequently, the residuals of this regression model is random, indicating that the model successfully capture all of the pattern within the changes in COVID-19 case rates across Toronto's neighbourhoods. This means that the model does not need to be adjusted since its assumption that the residuals are independent has not been violated, so the results obtained from the model (summarized in Table 2) are valid.
+The result of the Moran's I hypothesis test supports the visual observation of Figure 7. The null hypothesis of the test is that the pattern analyzed is spatially random. The p-value is 0.1871, which is greater than 0.05 and thus large enough to accept the null hypothesis. Consequently, the residuals of this regression model is random, indicating that the model successfully capture all of the pattern within the changes in COVID-19 case rates across Toronto's neighbourhoods. This means that the model does not need to be adjusted since its assumption that the residuals are independent has not been violated, so the results obtained from the model (summarized in Table 2) are valid.
 
 # Conclusion
 
