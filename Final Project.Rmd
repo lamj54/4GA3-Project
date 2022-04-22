@@ -124,6 +124,8 @@ This study used RStudio to conduct both the data pre-processing, that is cleanin
 
 The analysis was done using several R packages, including spatstat, tidyverse, ggplot2, dplyr, webshot, gridExtra, patchwork, and spdep to analyze the area data and find a potential relationship between the chosen independent variables () and the dependent variable () for the city of Toronto. For the initial visualization and analysis of the area data, choropleth maps and Moran’s I were used to identify patterns in the data. Then, to gain more insight on the process behind these patterns, regression analysis was used to determine the relationship between the independent and dependent variables.
 
+A unique method was ran to covered the date data in the COVID-19 case table into character data type. This was so the records could be parsed in respect to this studies period of interest. 
+
 This document was also written and exported through R-Markdown with minimal adaptation from Steven V. Miller's template for academic manuscripts. See: [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/)[https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex] and (https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex)
 
 The data and code used in this project can be found on Github: [https://github.com/lamj54/4GA3-Project](https://github.com/lamj54/4GA3-Project). This document is also available as a RMarkdown file, which includes both the code and the text used to create this report. 
@@ -156,12 +158,18 @@ neighbourhood <- read_csv(paste(wd,"/data/Neighbourhood_POP.csv", sep=""))
 ```
 
 ```{r, include = FALSE}
+
+# Convert data data type into character
 chr <- as.character.Date(covidcases$`Episode Date`)
               
 covidcases$'nd' <-chr 
 
+# dates of interest
+
 fweek <- c("2021-12-01","2021-12-02","2021-12-03","2021-12-04","2021-12-05","2021-12-06","2021-12-07")
 lweek <- c("2021-12-25","2021-12-26","2021-12-27","2021-12-28","2021-12-29","2021-12-30","2021-12-31")
+
+#filter for dates of interest 
 
 fweektb <- subset(covidcases,nd %in% fweek)
 lweektb <- subset(covidcases,nd %in% lweek)
