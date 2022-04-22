@@ -1,7 +1,6 @@
 ---
-title: "Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario"
-#subtitle: "A subtitle"
-thanks: ""
+title: 'Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave
+  of SARS-CoV-2 in Toronto, Ontario'
 author:
 - name: Jason Lam
   student_number: 400201299
@@ -11,20 +10,22 @@ author:
   student_number: 400188361
 - name: Jenny Chau
   student_number: 400233137
-- name: Pierce Bourgeois 
+- name: Pierce Bourgeois
   student_number: 400220858
-subject: "ENVSOCTY 4GA3"
-abstract: ""
-keywords: "Income, Toronto, COVID-19, Spatial Statisitics, Spatial Analysis"
 date: "4/22/2022"
 output:
   pdf_document:
-    # The project-template-default.tex file was minimally adapted from Steven V. Miller's template for academic manuscripts. See:
-    # http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/
-    # https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex
     template: project-template-default.tex
-bibliography: [bibliography.bib, packages.bib]
-always_allow_html: true
+  html_document:
+    df_print: paged
+abstract: ''
+keywords: Income, Toronto, COVID-19, Spatial Statisitics, Spatial Analysis
+thanks: ''
+subject: ENVSOCTY 4GA3
+bibliography:
+- bibliography.bib
+- packages.bib
+always_allow_html: yes
 ---
 
 <!--Chunks of code can have names; the chunk option "include" controls whether the chunk and its output are printed in the final document-->
@@ -305,6 +306,8 @@ From Figure 4, it seems that there may be a greater population density in some o
 
 Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates.  
 
+\newpage
+
 ```{r, echo = FALSE, fig.cap = "The change in COVID-19 rates (cases per 10,000) between the first and last week of December 2021 in Toronto by neighbourhood"}
 # have change in COVID case rates (cases per 10000) between first and last week
 # by difference and fold-change
@@ -351,6 +354,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+\newpage
 
 ## Spatial autocorrelation
 
