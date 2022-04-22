@@ -190,7 +190,7 @@ ggplot(data = Final_Table) +
   scale_fill_distiller(name = "Fold Change",
                        palette = "YlOrRd", 
                        direction = 1) +
-  ggtitle("Change in COVID-19 Rates (Cases per 10,000) Between the First and \n Last Week of December 2021 in Toronto by Neighbourhood") +
+  # ggtitle("Change in COVID-19 Rates (Cases per 10,000) Between the First and \n Last Week of December 2021 in Toronto by Neighbourhood") +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -243,7 +243,7 @@ ggplot(data = Final_Table) +
   scale_fill_distiller(name = "Average Income ($)",
                        palette = "YlOrRd", 
                        direction = 1) +
-  ggtitle("Average Income in Toronto by Neighbourhood") #maybe adjust this later for detail
+  # ggtitle("Average Income in Toronto by Neighbourhood") #maybe adjust this later for detail +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -253,7 +253,7 @@ ggplot(data = Final_Table) +
   scale_fill_distiller(name = "Population Percentage",
                        palette = "YlOrRd", 
                        direction = 1) +
-  ggtitle("Proportion of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...)
+  # ggtitle("Proportion of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
@@ -265,12 +265,14 @@ Final_Table$pop_density <- Final_Table$POP / Final_Table$Shape__Area
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = pop_density)) + 
-  scale_fill_distiller(name = "Population Density",
+  scale_fill_distiller(name = "People per sqaure km",
                        palette = "YlOrRd", 
                        direction = 1) +
   theme_minimal() + 
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
 ## Testing Dependent Variable for Randomness
 
 Q: is the pattern of changes in COVID-19 rates random or non-random?
@@ -352,6 +354,7 @@ moran.test(Final_Table$fold_increase, Final_Table.w)
 ### Local Moran's I
 ```{r}
 fold_increase.local <- localmoran(Final_Table$fold_increase, Final_Table.w)
+
 colnames(fold_increase.local) <- c("Ii", "E.Ii", "Var.Ii", "Z.Ii", "p.val")
 
 Final_Table <- Final_Table %>% 
@@ -361,14 +364,29 @@ Final_Table <- Final_Table %>%
 ```
 
 ```{r}
-# plot_ly(Final_Table) %>%
-#     add_sf(type = "scatter",
-#            split = ~(p.val < 0.05), 
-#            color = ~Type, 
-#            colors = c("red", 
-#                       "khaki1", 
-#                       "dodgerblue", 
-#                       "dodgerblue4")) 
+Final_Table <- Final_Table %>% 
+  mutate(Z = (fold_increase - mean(fold_increase)) / var(fold_increase), 
+         SMA = lag.listw(Final_Table.w, Z), 
+         significance = p.val <= 0.05,
+         Type = case_when((Z > 0 & SMA > 0) & significance == TRUE ~ "HH significant",
+                          (Z > 0 & SMA > 0) & significance == FALSE ~ "HH not significant",
+                          (Z < 0 & SMA < 0) & significance == TRUE ~ "LL significant",
+                          (Z < 0 & SMA < 0) & significance == FALSE ~ "LL not significant",
+                          (Z * SMA < 0) & significance == TRUE ~ "HL/LH significant",
+                          (Z * SMA < 0) & significance == FALSE ~ "HL/LH not significant"))
+```
+
+```{r}
+ggplot(Final_Table) +
+  geom_sf(aes(fill = Type),
+          color = "black") + 
+  scale_fill_manual(values = c("HH significant" = "red", 
+                               "HH not significant" = "darksalmon",
+                               "LL significant" = "dodgerblue",
+                               "LL not significant" = "lightskyblue",
+                               "HL/LH significant" = "ivory4",
+                               "HL/LH not significant" = "gray")) +
+  theme_void() 
 ```
 
 
