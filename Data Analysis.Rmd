@@ -194,6 +194,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
 ```{r}
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = F_weekrate)) + 
@@ -204,6 +205,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
 ```{r}
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = L_weekrate)) + 
@@ -247,6 +249,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
 ```{r}
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = perc_18_24)) + 
@@ -351,6 +354,7 @@ ggplot(data = Final_Table2, aes(x = fold, y = fold_sma, color = VAR)) +
 mp <- moran.plot(Final_Table$fold_increase, Final_Table.w)
 moran.test(Final_Table$fold_increase, Final_Table.w)
 ```
+
 ### Local Moran's I
 ```{r}
 fold_increase.local <- localmoran(Final_Table$fold_increase, Final_Table.w)

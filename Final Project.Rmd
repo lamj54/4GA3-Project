@@ -10,7 +10,7 @@ author:
 - name: Syed Hammad Uddin
   student_number: 400188361
 - name: Jenny Chau
-  student_number: 40023317
+  student_number: 400233137
 - name: Pierce Bourgeois 
   student_number: 400220858
 subject: "ENVSOCTY 4GA3"
@@ -36,6 +36,9 @@ library(ggplot2)
 library(rgdal)
 library(sf)
 library(dplyr)
+library(gridExtra)
+library(patchwork)
+library(spdep)
 ```
 
 ```{r write-package-bib, include=FALSE}
@@ -117,21 +120,242 @@ The COVID-19 data was retrieved from the City of Toronto Open Data portal [@TPH_
 
 # Methods
 
-This study used RStudio to conduct both the data pre-processing, that is cleaning of the original datasets as well as the analysis. The data pre-processing file can be found here: [https://github.com/lamj54/4GA3-Project/blob/main/Data%20Pre-Processing.Rmd](https://github.com/lamj54/4GA3-Project/blob/main/Data%20Pre-Processing.Rmd) 
+This study used RStudio to conduct both the data pre-processing, that is cleaning of the original datasets, as well as the analysis. 
 
-The analysis was done using several R packages, including spatstat, tidyverse, ggplot2, dplyr, webshot, gridExtra, patchwork, and spdep.
+The analysis was done using several R packages, including spatstat, tidyverse, ggplot2, dplyr, webshot, gridExtra, patchwork, and spdep to analyze the area data and find a potential relationship between the chosen independent variables () and the dependent variable () for the city of Toronto. For the initial visualization and analysis of the area data, choropleth maps and Moran’s I were used to identify patterns in the data. Then, to gain more insight on the process behind these patterns, regression analysis was used to determine the relationship between the independent and dependent variables.
 
 This document was also written and exported through R-Markdown with minimal adaptation from Steven V. Miller's template for academic manuscripts. See: [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/)[https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex] and (https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex)
 
+The data and code used in this project can be found on Github: [https://github.com/lamj54/4GA3-Project](https://github.com/lamj54/4GA3-Project). This document is also available as a RMarkdown file, which includes both the code and the text used to create this report. 
 
-# Results
+<!--Data cleaning section-->
+```{r, include = FALSE}
+#Deleting the neighbourhood ID from the neighbourhood field for pairing to final table
+
+#Extracting column as matrix
+f2 <- as.matrix(nshp[2])
+
+#deleting geometry field
+f2 <- subset(f2, select = -c(geometry) )
+
+#deleting neighbourhood IDs
+f2 <- gsub("[1234567890()]", " ", f2)
+
+#deleting space after
+f2 <- str_squish(f2)
+
+#rejoining to shp file
+nshp[2] <- f2
+```
+
+```{r, include = FALSE}
+#Covid Cases
+covidcases <- read_csv(paste(wd,"/data/COVID19 cases.csv", sep=""))
+#Neighborhood Data 
+neighbourhood <- read_csv(paste(wd,"/data/Neighbourhood_POP.csv", sep=""))
+```
+
+```{r, include = FALSE}
+chr <- as.character.Date(covidcases$`Episode Date`)
+              
+covidcases$'nd' <-chr 
+
+fweek <- c("2021-12-01","2021-12-02","2021-12-03","2021-12-04","2021-12-05","2021-12-06","2021-12-07")
+lweek <- c("2021-12-25","2021-12-26","2021-12-27","2021-12-28","2021-12-29","2021-12-30","2021-12-31")
+
+fweektb <- subset(covidcases,nd %in% fweek)
+lweektb <- subset(covidcases,nd %in% lweek)
+
+ftab <- as.data.frame(table(fweektb$`Neighbourhood Name`)) 
+ltab <- as.data.frame(table(lweektb$`Neighbourhood Name`)) 
+```
+
+```{r, include = FALSE}
+covidcases$`Episode Date`[1]
+```
+
+```{r, include = FALSE}
+#This section in creating final_table 
+
+#Neighbourhood_Name, F_weekcases, L_weekcases, POP, F_weekrate,, L_weekrate, Rate_over_month, Case_over_month
+
+#We need to add population for each neighbourhood and join it to the final table 
+
+Neighbourhood <- ftab$Var1
+F_weekcases <- ftab$Freq
+L_weekcases <- ltab$Freq
+Case_over_month <- ltab$Freq - ftab$Freq
+
+#Create Final table 
+Final_Table <- data.frame(Neighbourhood, F_weekcases, L_weekcases)
+
+```
+
+```{r, include = FALSE}
+#3 Neighbourhood are different so there must be an manual correction prior to merging 
+
+neighbourhood$Neighbourhood[128] <- "Weston-Pellam Park"
+neighbourhood$Neighbourhood[16] <- "Briar Hill - Belgravia"
+neighbourhood$Neighbourhood[30] <- "Danforth-East York"
+
+```
+
+```{r, include = FALSE}
+#Merge neighbour with final table
+Final_Table <- merge(Final_Table, neighbourhood)
+
+# Creating the case rates per 10,000  
+Final_Table$F_weekrate <- Final_Table$F_weekcases/Final_Table$POP * 10000
+Final_Table$L_weekrate <- Final_Table$L_weekcases/Final_Table$POP * 10000
+
+# Creating rate change 
+Final_Table$Rate_Change <- Final_Table$L_weekrate - Final_Table$F_weekrate
+
+# Creating fold increase 
+Final_Table$fold_increase <- Final_Table$L_weekrate/Final_Table$F_weekrate 
+```
+
+```{r, include = FALSE}
+#Neighbourhood Income Data
+Socioeconomic_variables <- read_csv(paste(wd,"/data/Neighbourhoods_socioeconomic_variables.csv", sep=""))
+
+```
+
+```{r, include = FALSE}
+#3 neighbourhoods are different so there must be an manual correction prior to merging 
+Socioeconomic_variables$Neighbourhood[128] <- "Weston-Pellam Park"
+Socioeconomic_variables$Neighbourhood[16] <- "Briar Hill - Belgravia"
+Socioeconomic_variables$Neighbourhood[30] <- "Danforth-East York"
+```
+
+```{r, include = FALSE}
+#Merge neighbourhood socioeconomic variables data with final table
+Final_Table <- merge(Final_Table, Socioeconomic_variables)
+```
+
+```{r, include = FALSE}
+#Merging shpfile to final table
+
+nshp$FIELD_2[22] <- "Danforth-East York"
+nshp$FIELD_2[25] <- "North St. James Town"
+nshp$FIELD_2[93] <- "Mimico (includes Humber Bay Shores)"
+nshp$FIELD_2[114] <- "Briar Hill - Belgravia"
+nshp$FIELD_2[115] <- "Cabbagetown-South St. James Town"
+
+nshp <- nshp %>%
+  rename(Neighbourhood = FIELD_2)
+Final_Table <- left_join(nshp, Final_Table, by = "Neighbourhood")
+
+Final_Table <- Final_Table %>%
+  rename(`_id` = FIELD_1,
+          AREA_ATTR_ID = FIELD_3,
+          PARENT_AREA_ID = FIELD_4,
+          AREA_SHORT_CODE = FIELD_5,
+          AREA_LONG_CODE = FIELD_6,
+          AREA_NAME = FIELD_7,
+          AREA_DESC = FIELD_8,
+          X = FIELD_9,
+          Y = FIELD_10,
+          LONGITUDE = FIELD_11,
+          LATITUDE = FIELD_12,
+          OBJECTID = FIELD_13,
+          Shape__Area = FIELD_14,
+          Shape__Length = FIELD_15)
+
+```
+
+```{r, include = FALSE}
+# to calculate population density
+Final_Table$pop_density <- Final_Table$POP / Final_Table$Shape__Area
+```
 
 
 # Analysis
 
+## Data Exploration
+
+First, to obtain a preliminary understanding of trends in the data, choropleth maps were used to visualize the fold change in COVID-19 cases between the first and last week of December 2021 (Figure 2), per capita income (Figure 3), population density (Figure 4), and the proportion of 18- to 24-year-old individuals in each neighbourhood in Toronto (Figure 5).
+
+```{r, echo = FALSE, fig.cap = "The change in COVID-19 rates (cases per 10,000) between the first and last week of December 2021 in Toronto by neighbourhood"}
+# have change in COVID case rates (cases per 10000) between first and last week
+# by difference and fold-change
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = fold_increase)) + 
+  scale_fill_distiller(name = "Fold Change",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  # ggtitle("Change in COVID-19 Rates (Cases per 10,000) Between the First and \n Last Week of December 2021 in Toronto by Neighbourhood") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+In Figure 2, it can be seen that the fold change for all neighbourhoods in Toronto is positive, indicating that they all experienced an increase in COVID-19 case rates in the last week of December 2021 compared to the first week of December 2021. In particular, the neighbourhoods coloured in a darker red and orange showed a significantly large fold change in COVID-19 rates in comparison to other neighbourhoods, which possibly signifies the location of COVID-19 hotspots during December 2021. Accordingly, the neighbourhoods located close to such spots seem to have relatively large fold changes as well, as shown through their light orange colour. Neighbourhoods with smaller fold changes, seen in yellow in the map, appear to be located further away from areas with more intense fold changes.
+
+```{r, include = FALSE}
+# rename column names so it's easier to call
+Final_Table <- Final_Table %>%
+  rename(avg_income = `Average income $ (Total income in 2010 of population aged 15 years and over)`,
+         perc_18_24 = `Percent of Pop Age 18 to 24`)
+```
+
+```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood"}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = avg_income)) + 
+  scale_fill_distiller(name = "Average Income ($)",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  # ggtitle("Average Income in Toronto by Neighbourhood") #maybe adjust this later for detail +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Neighbourhoods with greater average income appear darker in colour on the map in Figure 3, showing that people with higher income tend to concentrate near the center of Toronto. Other neighbourhoods with high average income can be seen in the west of Toronto as well. 
+
+From a visual comparison of Figures 2 and 3, it looks like the neighbourhoods with higher average incomes have lower fold changes in COVID-19 case rates while the neighbourhoods with high fold changes are those with lower average incomes. 
+
+
+```{r, echo = FALSE, fig.cap = The population density of each of Toronto’s neighbourhoods}
+
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = pop_density)) + 
+  scale_fill_distiller(name = "People per sqaure km",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  theme_minimal() + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+From Figure 4, it seems that there may be a greater population density in neighbourhoods located towards the southern and northeastern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city.
+[insert choropleth map for population prop]
+
+```{r, echo = FALSE, fig.cap = "The proportion of 18- to 24-year-old individuals in Toronto by neighbourhood"}
+ggplot(data = Final_Table) +
+  geom_sf(aes(fill = perc_18_24)) + 
+  scale_fill_distiller(name = "Population Percentage",
+                       palette = "YlOrRd", 
+                       direction = 1) +
+  # ggtitle("Proportion of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. 
+
+## Spatial autocorrelation
+Before doing a regression analysis to determine the relationship between the change in COVID-19 case rates and the predictor variables, an analysis of the pattern in the change in COVID-19 case rates must first be done. If its pattern is non-random, then regression analysis can be used to provide more information about the process that is creating this pattern.
+
+To test whether a spatial pattern is random or non-random, Moran’s I, a coefficient of spatial autocorrelation, can be calculated and used in a hypothesis test that assesses for spatial randomness. The null hypothesis of this test is that the pattern is spatially random. The results of the Moran’s I test on the change in COVID-19 case rates can be seen in Figure 6.
+
+```{r, echo = FALSE, fig.cap = "The results of the hypothesis test using Moran’s I on the change in COVID-19 case rates between the first and last week of December 2021 in Toronto."}
+
+moran.test(Final_Table$fold_increase, Final_Table.w)
+```
+
+From Figure 6, the Moran’s I statistic for this data is 0.089308782 and the p-value of the test is 0.01787. Since the p-value is less than 0.05, it is sufficiently small enough to reject the null hypothesis with a high degree of confidence. This means that the change in COVID-19 case rates is spatially autocorrelated, not spatially random. As well, since the Moran’s I statistic is positive, it suggests that it is a non-random spatial pattern where high values tend to be with other high values, and low values tend to be with other low values. This agrees with the visual observation of the choropleth map of the change in COVID-19 case rates in Figure 2. 
 
 # Conclusion
 
-This study shows that there is a clear connection between a lower-income status and the incidence rates of the COVID-19. The results show that other socio-economic factors, such as age or population density did not have a clear connection with the data currently available. Socio-economic factors are therefore complex factors that need to be further explored. Identifying these groups from a socio-economic perspective is the first step to establishing that a person’s SEP may be as much of an indicator in predicting health outcomes as a pre-existing medical condition. In establishing such similarities, governing healthcare bodies may extend precautionary recommendations to people with specific socio-economic conditions, thus providing a more in-depth and informed disease prevention plan. In a pursuit of identifying groups of the populations who are more susceptible to poorer outcomes when combatting health problems, more research needs to be undertaken. 
+This study shows that there is a clear connection between a lower-income status and the incidence rates of the COVID-19. The results show that other socio-economic factors, such as age or population density did not have a clear connection with the data currently available. Socio-economic factors are therefore complex factors that need to be further explored. Identifying these groups from a socio-economic perspective is the first step to establishing that a person’s SEP may be as much of an indicator in predicting health outcomes as a pre-existing medical condition. In establishing such similarities, governing healthcare bodies may extend precautionary recommendations to people with specific socio-economic conditions, thus providing a more in-depth and informed disease prevention plan. In a pursuit of identifying groups of the populations who are more susceptible to poorer outcomes when combating health problems, more research needs to be undertaken. 
 
 # References
