@@ -40,6 +40,7 @@ library(gridExtra)
 library(patchwork)
 library(spdep)
 library(stargazer)
+library(knitr)
 ```
 
 ```{r write-package-bib, include=FALSE}
