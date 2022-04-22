@@ -94,7 +94,7 @@ tab_01 = data.frame(
 ```
 
 ```{r, echo=FALSE}
-tab_01 %>% knitr::kable(caption = "Waves of COVID-19 in Ontario", col.names = c("Wave", "Associated Variant", "Approx. Start", "Approx. End", "Peak Cases Per Day", "Total Cases"))
+tab_01 %>% knitr::kable(caption = "Waves of COVID-19 in Ontario", col.names = c("Wave", "Associated Variant", "Approx. Start", "Approx. End", "Peak Cases Per Day", "Total Cases"), format = "simple")
 ```
 
 The fifth wave of the pandemic lasted from the beginning of December 2021 until mid-February 2022. The catalyst for this was the emergence of a new, highly transmissible variant called Omicron. The variant, which was first reported globally in November 2021, has been thoroughly researched due to its scale and rate of infection. This research suggests that the variant is highly transmissible due to several factors. This includes the fact that Omicron is more likely to evade immunity from a previous infection, meaning that there is a high chance that you can get re-infected with COVID-19 [@Pulliam_Schalkwyk_Govender_Gottberg_Cohen_Groome_Dushoff_Mlisana_Moultrie_2021]. Other research suggests that the variant is up to 3.7% more infectious among vaccinated citizens than its predecessors [@Mohsin_Mahmud_2022]. During the fifth wave, it became the dominant strain and was responsible for 95% infections globally. In Ontario, the first Omicron cases were reported on November 28, 2021 [@GofO_2021]. During the Omicron wave, the highest number of new cases reported for a single day in the province was 19,373 [@PHO_2022].  
@@ -115,7 +115,7 @@ wd <- getwd()
 nshp <- st_read(paste(wd, "/data/Neighbourhoods.shp", sep = ""))
 ```
 
-```{r, echo=FALSE, fig.cap = "Neighbourhoods in Toronto, Ontario, Canada", fig.pos="H"}
+```{r, echo=FALSE, fig.cap = "Neighbourhoods in Toronto, Ontario, Canada"}
 #visualizing shpfile
 ggplot() + 
   geom_sf(data = nshp, size = 0.6, color = "white", fill = "grey") + 
@@ -301,15 +301,7 @@ First, to obtain a preliminary understanding of trends in the data, choropleth m
 
 In Figure 2, it can be seen that the fold change for all neighbourhoods in Toronto is positive, indicating that they all experienced an increase in COVID-19 case rates in the last week of December 2021 compared to the first week of December 2021. In particular, the neighbourhoods coloured in a darker red and orange showed a significantly large fold change in COVID-19 rates in comparison to other neighbourhoods, which possibly signifies the location of COVID-19 hotspots during December 2021. Accordingly, the neighbourhoods located close to such spots seem to have relatively large fold changes as well, as shown through their light orange colour. Neighbourhoods with smaller fold changes, seen in yellow in the map, appear to be located further away from areas with more intense fold changes.
 
-Neighbourhoods with greater average income appear darker in colour on the map in Figure 3, showing that people with higher income tend to concentrate near the center of Toronto. Other neighbourhoods with high average income can be seen in the west of Toronto as well. From a visual comparison of Figures 2 and 3, it looks like the neighbourhoods with high average incomes have lower fold changes in COVID-19 case rates while the neighbourhoods with the highest fold changes are those with lower average incomes. In addition, the neighbourhoods with more moderate fold changes in light orange are also low income neighbourhoods. The neighbourhoods with the lowest fold changes in COVID-19 case rates in light yellow correspond to relatively high income areas as well. These comparisons suggest that average income is negatively correlated with the change in COVID-19 case rates.
-
-From Figure 4, it seems that there may be a greater population density in some of the neighbourhoods located towards the southern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city. Comparing Figures 2 and 4, the neighbourhoods with very large fold changes do not have particularly high population densities, and the neighbourhoods with high population densities do not seem to have very high fold changes. Neighbourhoods with similar population densities appear to have different changes in COVID-19 case rates, which may indicate that its relationship with population density is very weak.
-
-Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high percentage of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates.  
-
-\newpage
-
-```{r, echo = FALSE, fig.cap = "The change in COVID-19 rates (cases per 10,000) between the first and last week of December 2021 in Toronto by neighbourhood", fig.pos="H"}
+```{r, echo = FALSE, fig.cap = "The change in COVID-19 rates (cases per 10,000) between the first and last week of December 2021 in Toronto by neighbourhood"}
 # have change in COVID case rates (cases per 10000) between first and last week
 # by difference and fold-change
 
@@ -323,7 +315,12 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood", fig.pos="H"}
+
+\newpage
+
+Neighbourhoods with greater average income appear darker in colour on the map in Figure 3, showing that people with higher income tend to concentrate near the center of Toronto. Other neighbourhoods with high average income can be seen in the west of Toronto as well. From a visual comparison of Figures 2 and 3, it looks like the neighbourhoods with high average incomes have lower fold changes in COVID-19 case rates while the neighbourhoods with the highest fold changes are those with lower average incomes. In addition, the neighbourhoods with more moderate fold changes in light orange are also low income neighbourhoods. The neighbourhoods with the lowest fold changes in COVID-19 case rates in light yellow correspond to relatively high income areas as well. These comparisons suggest that average income is negatively correlated with the change in COVID-19 case rates.
+
+```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood"}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = avg_income)) + 
@@ -335,7 +332,12 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r, echo = FALSE, fig.cap = "The population density of each neighbourhood in Toronto", fig.pos="H"}
+
+\newpage
+
+From Figure 4, it seems that there may be a greater population density in some of the neighbourhoods located towards the southern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city. Comparing Figures 2 and 4, the neighbourhoods with very large fold changes do not have particularly high population densities, and the neighbourhoods with high population densities do not seem to have very high fold changes. Neighbourhoods with similar population densities appear to have different changes in COVID-19 case rates, which may indicate that its relationship with population density is very weak.
+
+```{r, echo = FALSE, fig.cap = "The population density of each neighbourhood in Toronto"}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = pop_density)) + 
@@ -346,7 +348,12 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r, echo = FALSE, fig.cap = "The percentage of 18 to 24 year old individuals in Toronto by neighbourhood", fig.pos="H"}
+
+\newpage
+
+Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high percentage of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates. 
+
+```{r, echo = FALSE, fig.cap = "The percentage of 18 to 24 year old individuals in Toronto by neighbourhood"}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = perc_18_24)) + 
@@ -357,6 +364,7 @@ ggplot(data = Final_Table) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
 
 ## Spatial autocorrelation
 
@@ -397,7 +405,7 @@ Final_Table <- Final_Table %>%
                           (Z * SMA < 0) & significance == FALSE ~ "HL/LH not significant"))
 ```
 
-```{r, echo = FALSE, fig.cap = "The categorization of neighbourhoods based on local Moran's I, a statistic that describes the autocorrelation of a specific location and its contribution to the global Moran's I statistic", fig.pos="H"}
+```{r, echo = FALSE, fig.cap = "The categorization of neighbourhoods based on local Moran's I, a statistic that describes the autocorrelation of a specific location and its contribution to the global Moran's I statistic"}
 
 ggplot(Final_Table) +
   geom_sf(aes(fill = Type)) + 
@@ -441,7 +449,7 @@ To determine whether the model has successfully retrieved all of the systematic 
 
 The residuals can first be visualized with a map by plotting the sign of the residual for each neighbourhood (Figure 7). A positive residual indicates that the model overestimates the change in COVID-19 case rates, while a negative residual means that the model underestimates it.
 
-```{r, echo = FALSE, fig.cap = "Map of the sign of the residuals from the regression model for each neighbourhood", fig.pos="H"}
+```{r, echo = FALSE, fig.cap = "Map of the sign of the residuals from the regression model for each neighbourhood"}
 Final_Table <- Final_Table %>%
   mutate(residual_type = ifelse(model1$residuals > 0,
                                 "Positive",
