@@ -63,7 +63,7 @@ To cite references in your bibliography.bib file, use [@item] if you want it to 
 # Introduction
 
 Since the first cases in 2019, the COVID-19 outbreak has taken the world by storm. As of writing this (April 2022), there are over five hundred million cases reported worldwide [@WHO_2022]. With its ability to rapidly spread, the COVID-19 has had profound consequences in every facet of public and private life. Among these include medical, economic, and social spaces [@Baena-Diez_Barroso_Cordeiro-Coelho_Diaz_Grau_2020].  Most importantly, these unsettling times have shone a light on pre-existing disparities within national health systems. For many researchers, this does not come as a surprise as socioeconomic factors influencing health outcomes have been noted ubiquitously throughout the world [@Khalatbari-Soltani_Cumming_Delpierre_Kelly-Irving_2020]. According to Khalatbari-Soltani et al. (2020), there is even a link between those socio-economically disadvantaged and increased risk of infectious disease.  
-This research continues in a vein of spatial statistical studies which analyze COVID-19 incidence rates paired with a socio-economic factor. Building upon Khalatabari-Soltani, et al. (2020) and the socio-economic position (SEP) framework, this study seeks to examine the relationship between income levels, population density, and proportion of young adults against COVID-19 incidence rates. More specifically, the overarching objective of this study is to analyze the relationship between the noted socio-economic variables and incidence rates of COVID-19 during the fifth wave in Toronto, Ontario, Canada.
+This research continues in a vein of spatial statistical studies which analyze COVID-19 incidence rates paired with a socio-economic factor. Building upon Khalatabari-Soltani, et al. (2020) and the socio-economic position (SEP) framework, this study seeks to examine the relationship between income levels, population density, and percentage of young adults against COVID-19 incidence rates. More specifically, the overarching objective of this study is to analyze the relationship between the noted socio-economic variables and incidence rates of COVID-19 during the fifth wave in Toronto, Ontario, Canada.
   
 # Background
 
@@ -98,7 +98,7 @@ tab_01 %>% knitr::kable(caption = "Waves of COVID-19 in Ontario", col.names = c(
 
 The fifth wave of the pandemic lasted from the beginning of December 2021 until mid-February 2022. The catalyst for this was the emergence of a new, highly transmissible variant called Omicron. The variant, which was first reported globally in November 2021, has been thoroughly researched due to its scale and rate of infection. This research suggests that the variant is highly transmissible due to several factors. This includes the fact that Omicron is more likely to evade immunity from a previous infection, meaning that there is a high chance that you can get re-infected with COVID-19 [@Pulliam_Schalkwyk_Govender_Gottberg_Cohen_Groome_Dushoff_Mlisana_Moultrie_2021]. Other research suggests that the variant is up to 3.7% more infectious among vaccinated citizens than its predecessors [@Mohsin_Mahmud_2022]. During the fifth wave, it became the dominant strain and was responsible for 95% infections globally. In Ontario, the first Omicron cases were reported on November 28, 2021 [@GofO_2021]. During the Omicron wave, the highest number of new cases reported for a single day in the province was 19,373 [@PHO_2022].  
 
-This study will determine how average income, proportion of youths, and population density may affect the change in COVID-19 case rates between the first and last week of December 2021.
+This study will determine how average income, percentage of youths, and population density may affect the change in COVID-19 case rates between the first and last week of December 2021.
 
 
 # Study area 
@@ -296,7 +296,7 @@ Final_Table.w <- nb2listw(Final_Table.nb)
 
 ## Data Exploration
 
-First, to obtain a preliminary understanding of trends in the data, choropleth maps were used to visualize the fold change in COVID-19 cases between the first and last week of December 2021 (Figure 2), per capita income (Figure 3), population density (Figure 4), and the proportion of 18- to 24-year-old individuals in each neighbourhood in Toronto (Figure 5).
+First, to obtain a preliminary understanding of trends in the data, choropleth maps were used to visualize the fold change in COVID-19 cases between the first and last week of December 2021 (Figure 2), per capita income (Figure 3), population density (Figure 4), and the percentage of 18- to 24-year-old individuals in each neighbourhood in Toronto (Figure 5).
 
 In Figure 2, it can be seen that the fold change for all neighbourhoods in Toronto is positive, indicating that they all experienced an increase in COVID-19 case rates in the last week of December 2021 compared to the first week of December 2021. In particular, the neighbourhoods coloured in a darker red and orange showed a significantly large fold change in COVID-19 rates in comparison to other neighbourhoods, which possibly signifies the location of COVID-19 hotspots during December 2021. Accordingly, the neighbourhoods located close to such spots seem to have relatively large fold changes as well, as shown through their light orange colour. Neighbourhoods with smaller fold changes, seen in yellow in the map, appear to be located further away from areas with more intense fold changes.
 
@@ -304,7 +304,7 @@ Neighbourhoods with greater average income appear darker in colour on the map in
 
 From Figure 4, it seems that there may be a greater population density in some of the neighbourhoods located towards the southern areas of Toronto. Population density appears to be lower in neighbourhoods located in the outskirts of the city. Comparing Figures 2 and 4, the neighbourhoods with very large fold changes do not have particularly high population densities, and the neighbourhoods with high population densities do not seem to have very high fold changes. Neighbourhoods with similar population densities appear to have different changes in COVID-19 case rates, which may indicate that its relationship with population density is very weak.
 
-Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high proportion of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates.  
+Looking at Figure 5, there are a cluster of neighbourhoods in the south of Toronto, coloured in red, that have a particularly high percentage of 18- to 24-year-old individuals making up their population. In addition, a neighbourhood located near the north, in dark orange, has a relatively high percentage of 18- to 24-year-old individuals. Comparing this map to Figure 2, it seems that the neighbourhoods with higher percentages of youth have lower changes in COVID-19 case rates. Accordingly, the neighbourhoods with high fold changes have a relatively small percentage of youth in them. These observations may suggest that the percentage of youth in a neighbourhood is actually negatively correlated with change in COVID-19 rates.  
 
 \newpage
 
@@ -323,6 +323,7 @@ ggplot(data = Final_Table) +
 ```
 
 ```{r, echo = FALSE, fig.cap = "The average income of individuals in Toronto by neighbourhood"}
+
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = avg_income)) + 
   scale_fill_distiller(name = "Average Income ($)",
@@ -333,7 +334,7 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r, echo = FALSE, fig.cap = "The population density of each of Toronto’s neighbourhoods"}
+```{r, echo = FALSE, fig.cap = "The population density of each neighbourhood in Toronto"}
 
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = pop_density)) + 
@@ -344,13 +345,14 @@ ggplot(data = Final_Table) +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r, echo = FALSE, fig.cap = "The proportion of youth (18 to 24 years old) in Toronto by neighbourhood"}
+```{r, echo = FALSE, fig.cap = "The percentage of 18 to 24 year old individuals in Toronto by neighbourhood"}
+
 ggplot(data = Final_Table) +
   geom_sf(aes(fill = perc_18_24)) + 
   scale_fill_distiller(name = "Population Percentage",
                        palette = "YlOrRd", 
                        direction = 1) +
-  # ggtitle("Proportion of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...) +
+  # ggtitle("percentage of People Aged 18-24 in Toronto by Neighbourhood") #maybe adjust this later for detail (e.g., as of...) +
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5))
 ```
