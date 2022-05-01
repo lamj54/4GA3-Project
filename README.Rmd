@@ -1,31 +1,32 @@
 ---
-title: "Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario"
-author:
-- name: Jason Lam
-  student_number: 400201299
-- name: Emily Fletcher
-  student_number: 400210334
-- name: Syed Hammad Uddin
-  student_number: 400188361
-- name: Jenny Chau
-  student_number: 400233137
-- name: Pierce Bourgeois
-  student_number: 400220858
-date: "4/22/2022"
 output:
-  pdf_document:
-    template: project-template-default.tex
-  html_document:
-    df_print: paged
-abstract: ''
-keywords: Income, Toronto, COVID-19, Spatial Statisitics, Spatial Analysis
-thanks: ''
-subject: ENVSOCTY 4GA3
+  github_document:
+    pandoc_args: --webtex
 bibliography: [bibliography.bib, packages.bib]
-always_allow_html: yes
 ---
 
-<!--Chunks of code can have names; the chunk option "include" controls whether the chunk and its output are printed in the final document-->
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario
+
+Final Project Report submitted for ENVSOCTY 4GA3 Applied Spatial Statistics (McMaster University, April 2022)
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Jason Lam  
+Emily Fletcher  
+Syed Hammad Uddin  
+Jenny Chau  
+Pierce Bourgeois  
+
 ```{r load-packages, include=FALSE}
 library(gridExtra)
 library(here) # Find files in a project easily
