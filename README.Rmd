@@ -1,32 +1,32 @@
 ---
-title: "Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario"
-author:
-- name: Jason Lam
-  student_number: 400201299
-- name: Emily Fletcher
-  student_number: 400210334
-- name: Syed Hammad Uddin
-  student_number: 400188361
-- name: Jenny Chau
-  student_number: 400233137
-- name: Pierce Bourgeois
-  student_number: 400220858
-date: "4/22/2022"
 output:
-  pdf_document:
-    template: project-template-default.tex
-  html_document:
-    df_print: paged
-urlcolor: blue
-abstract: ''
-keywords: Income, Toronto, COVID-19, Spatial Statisitics, Spatial Analysis
-thanks: ''
-subject: ENVSOCTY 4GA3
+  github_document:
+    pandoc_args: --webtex
 bibliography: [bibliography.bib, packages.bib]
-always_allow_html: yes
 ---
 
-<!--Chunks of code can have names; the chunk option "include" controls whether the chunk and its output are printed in the final document-->
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Income as a Determinant of the Speed of Transmission: Study of the Fifth Wave of SARS-CoV-2 in Toronto, Ontario
+
+Final Project Report submitted for ENVSOCTY 4GA3 Applied Spatial Statistics (McMaster University, April 2022)
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+Jason Lam  
+Emily Fletcher  
+Syed Hammad Uddin  
+Jenny Chau  
+Pierce Bourgeois  
+
 ```{r load-packages, include=FALSE}
 library(gridExtra)
 library(here) # Find files in a project easily
@@ -146,9 +146,9 @@ This study used RStudio to conduct the data pre-processing, that is cleaning of 
 
 The analysis was also done in RStudio using several R packages, including spatstat, tidyverse, ggplot2, dplyr, gridExtra, patchwork, and spdep to analyze the area data and find a potential relationship between the chosen independent variables (average income, percentage of 18-24 year old individuals, population density) and the dependent variable (fold change in COVID-19 case rates from the first to last week of December 2021) for the neighbourhoods of Toronto. For the initial visualization and analysis of the area data, choropleth maps and Moran’s I were used to identify patterns in the data. Then, to gain more insight on the process behind these patterns, regression analysis was used to determine the relationship between the independent and dependent variables.
 
-This document was also written and exported through R-Markdown with minimal adaptation from Steven V. Miller's template for academic manuscripts. See: [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/) and [https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex](https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex).
+This document was also written and exported through R-Markdown with minimal adaptation from Steven V. Miller's template for academic manuscripts. See: [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/)[https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex] and (https://github.com/svmiller/svm-r-markdown-templates/blob/master/svm-latex-ms.tex)
 
-The data and code used in this project can be found on  Github: [https://github.com/lamj54/4GA3-Project](https://github.com/lamj54/4GA3-Project). This document is also available in the repository as a RMarkdown file, which includes both the code and the text used to create this report. 
+The data and code used in this project can be found on Github: [https://github.com/lamj54/4GA3-Project](https://github.com/lamj54/4GA3-Project). This document is also available as a RMarkdown file, which includes both the code and the text used to create this report. 
 
 <!--Data cleaning section-->
 ```{r, include = FALSE}
